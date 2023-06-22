@@ -17,9 +17,9 @@ tdm:
     - 2042
     - 2046
     - 2050
-  main_dir: D:/Josh_Projects/REMM_TDM/_TDMv9.0.0_REMM_emptyStructure/REMM/REMM_
-  input_dir: REMMRun/TDM_SE_INPUT
-  bat_dir: D:/Josh_Projects/REMM_TDM/_TDMv9.0.0_REMM_emptyStructure/REMM
+  main_dir: TDM/_TDMv9.0.0_REMM_emptyStructure/REMM/REMM_
+  input_dir: TDM/_TDMv9.0.0_REMM/1_Inputs/2_SEData/REMM
+  bat_dir: TDM/_TDMv9.0.0_REMM_emptyStructure/REMM
   output_traveltime: 6_REMM/MinAuto_Trans_pk.dbf
   output_volume: 6_REMM/TwowayVolumeRoundTAZ.dbf
   output_logsum: 6_REMM/IJ_logsum.dbf
