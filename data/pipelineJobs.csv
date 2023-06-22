@@ -1,0 +1,743 @@
+﻿building_id,year,jobs,jobs_sector,dev_type,sector_id
+766623,2023,150,government,add additional,3
+766623,2024,110,manufacturing,add additional,5
+766623,2025,122,government,add additional,3
+766623,2025,89,manufacturing,add additional,5
+766623,2025,109,office,add additional,6
+766623,2026,127,government,add additional,3
+766623,2026,87,manufacturing,add additional,5
+766623,2026,106,office,add additional,6
+766623,2027,141,government,add additional,3
+766623,2027,79,manufacturing,add additional,5
+766623,2028,335,office,add additional,6
+766623,2029,170,manufacturing,add additional,5
+766623,2029,200,office,add additional,6
+766623,2029,210,other,add additional,7
+766623,2030,120,manufacturing,add additional,5
+766623,2030,167,office,add additional,6
+766623,2031,74,manufacturing,add additional,5
+766623,2031,84,other,add additional,7
+766623,2032,61,manufacturing,add additional,5
+766623,2032,42,office,add additional,6
+766623,2032,97,other,add additional,7
+766623,2033,81,manufacturing,add additional,5
+766623,2033,111,office,add additional,6
+766623,2033,45,other,add additional,7
+766623,2034,78,manufacturing,add additional,5
+766623,2034,195,office,add additional,6
+766623,2034,125,other,add additional,7
+766623,2035,194,office,add additional,6
+766623,2035,111,other,add additional,7
+766623,2036,227,office,add additional,6
+766623,2036,132,other,add additional,7
+766623,2037,228,office,add additional,6
+766623,2037,21,other,add additional,7
+766626,2020,128,office,add additional,3
+766541,2020,218,government,add additional,3
+766541,2020,650,manufacturing,add additional,5
+766541,2020,727,government,add additional,3
+766541,2020,205,manufacturing,add additional,5
+766541,2021,420,government,add additional,3
+766541,2022,330,government,add additional,3
+766541,2022,90,manufacturing,add additional,5
+766541,2023,26,government,add additional,3
+766541,2023,203,manufacturing,add additional,5
+766541,2023,86,office,add additional,6
+766541,2024,72,government,add additional,3
+766541,2024,179,manufacturing,add additional,5
+766541,2024,65,office,add additional,6
+766541,2025,128,government,add additional,3
+766541,2025,147,manufacturing,add additional,5
+766541,2025,40,office,add additional,6
+766527,2023,9,government,add additional,3
+766527,2023,68,manufacturing,add additional,5
+766527,2023,29,office,add additional,6
+766527,2024,24,government,add additional,3
+766527,2024,60,manufacturing,add additional,5
+766527,2024,22,office,add additional,6
+766527,2025,43,government,add additional,3
+766527,2025,49,manufacturing,add additional,5
+766527,2025,13,office,add additional,6
+766631,2023,225,government,add additional,3
+766631,2024,16,manufacturing,add additional,5
+766631,2024,209,government,add additional,3
+766631,2025,68,government,add additional,3
+766631,2025,105,manufacturing,add additional,5
+766631,2025,52,office,add additional,6
+766631,2026,96,government,add additional,3
+766631,2026,95,manufacturing,add additional,5
+766631,2026,34,office,add additional,6
+766631,2027,175,government,add additional,3
+766631,2027,50,manufacturing,add additional,5
+766631,2028,128,government,add additional,3
+766631,2029,120,government,add additional,3
+766631,2030,144,government,add additional,3
+766631,2032,85,government,add additional,3
+766631,2033,90,government,add additional,3
+766631,2034,96,government,add additional,3
+766631,2035,92,government,add additional,3
+766631,2036,115,government,add additional,3
+766631,2037,123,government,add additional,3
+766630,2023,275,government,add additional,3
+766630,2024,20,manufacturing,add additional,5
+766630,2024,255,government,add additional,3
+766630,2025,84,government,add additional,3
+766630,2025,128,manufacturing,add additional,5
+766630,2025,63,office,add additional,6
+766630,2026,117,government,add additional,3
+766630,2026,117,manufacturing,add additional,5
+766630,2026,41,office,add additional,6
+766630,2027,214,government,add additional,3
+766630,2027,61,manufacturing,add additional,5
+766630,2028,157,government,add additional,3
+766630,2029,146,government,add additional,3
+766630,2030,176,government,add additional,3
+766630,2032,103,government,add additional,3
+766630,2033,111,government,add additional,3
+766630,2034,118,government,add additional,3
+766630,2035,112,government,add additional,3
+766630,2036,141,government,add additional,3
+766630,2037,150,government,add additional,3
+766634,2028,38,government,add additional,3
+766634,2029,38,government,add additional,3
+766634,2030,38,government,add additional,3
+766634,2031,38,government,add additional,3
+766634,2032,38,government,add additional,3
+766634,2033,38,government,add additional,3
+766634,2034,38,government,add additional,3
+766634,2035,38,government,add additional,3
+766634,2036,38,government,add additional,3
+766634,2037,38,government,add additional,3
+766633,2028,12,government,add additional,3
+766633,2029,12,government,add additional,3
+766633,2030,12,government,add additional,3
+766633,2031,12,government,add additional,3
+766633,2032,12,government,add additional,3
+766633,2033,12,government,add additional,3
+766633,2034,12,government,add additional,3
+766633,2035,12,government,add additional,3
+766633,2036,12,government,add additional,3
+766633,2037,12,government,add additional,3
+766629,2028,100,government,add additional,3
+766629,2029,100,government,add additional,3
+766629,2030,100,government,add additional,3
+766629,2031,84,government,add additional,3
+766629,2032,100,government,add additional,3
+766647,2028,139,manufacturing,add additional,5
+766647,2028,181,office,add additional,6
+766647,2029,126,manufacturing,add additional,5
+766647,2029,248,office,add additional,6
+766647,2029,250,other,add additional,7
+766647,2030,60,government,add additional,3
+766647,2030,90,manufacturing,add additional,5
+766647,2030,100,office,add additional,6
+766647,2031,8,office,add additional,6
+766647,2031,90,manufacturing,add additional,5
+766647,2031,105,other,add additional,7
+766647,2032,70,manufacturing,add additional,5
+766647,2032,50,office,add additional,6
+766647,2032,130,other,add additional,7
+766647,2033,102,manufacturing,add additional,5
+766647,2033,144,office,add additional,6
+766647,2033,56,other,add additional,7
+766647,2034,103,manufacturing,add additional,5
+766647,2034,258,office,add additional,6
+766647,2034,165,other,add additional,7
+766647,2035,258,office,add additional,6
+766647,2035,145,other,add additional,7
+766647,2036,303,office,add additional,6
+766647,2036,175,other,add additional,7
+766647,2037,303,office,add additional,6
+766647,2037,24,other,add additional,7
+766541,2020,132,office,add additional,6
+766527,2020,33,office,add additional,6
+13567,2020,28,health care,add health job,4
+13567,2021,29,health care,add health job,4
+13567,2022,29,health care,add health job,4
+13567,2023,29,health care,add health job,4
+13567,2024,29,health care,add health job,4
+13567,2025,29,health care,add health job,4
+13567,2026,30,health care,add health job,4
+13567,2027,30,health care,add health job,4
+13567,2028,30,health care,add health job,4
+13567,2029,30,health care,add health job,4
+13567,2030,30,health care,add health job,4
+13567,2031,31,health care,add health job,4
+13567,2032,31,health care,add health job,4
+13567,2033,31,health care,add health job,4
+13567,2034,31,health care,add health job,4
+13567,2035,32,health care,add health job,4
+13567,2036,32,health care,add health job,4
+13567,2037,32,health care,add health job,4
+13567,2038,32,health care,add health job,4
+13567,2039,32,health care,add health job,4
+13567,2040,33,health care,add health job,4
+13567,2041,33,health care,add health job,4
+13567,2042,33,health care,add health job,4
+13567,2043,33,health care,add health job,4
+13567,2044,34,health care,add health job,4
+13567,2045,34,health care,add health job,4
+13567,2046,34,health care,add health job,4
+13567,2047,34,health care,add health job,4
+13567,2048,35,health care,add health job,4
+13567,2049,35,health care,add health job,4
+13567,2050,35,health care,add health job,4
+30196,2020,139,health care,add health job,4
+30196,2021,142,health care,add health job,4
+30196,2022,145,health care,add health job,4
+30196,2023,148,health care,add health job,4
+30196,2024,151,health care,add health job,4
+30196,2025,154,health care,add health job,4
+30196,2026,157,health care,add health job,4
+30196,2027,160,health care,add health job,4
+30196,2028,163,health care,add health job,4
+30196,2029,167,health care,add health job,4
+30196,2030,170,health care,add health job,4
+30196,2031,174,health care,add health job,4
+30196,2032,177,health care,add health job,4
+30196,2033,181,health care,add health job,4
+30196,2034,184,health care,add health job,4
+30196,2035,188,health care,add health job,4
+30196,2036,192,health care,add health job,4
+30196,2037,196,health care,add health job,4
+30196,2038,199,health care,add health job,4
+30196,2039,203,health care,add health job,4
+30196,2040,208,health care,add health job,4
+30196,2041,212,health care,add health job,4
+30196,2042,216,health care,add health job,4
+30196,2043,220,health care,add health job,4
+30196,2044,225,health care,add health job,4
+30196,2045,229,health care,add health job,4
+30196,2046,234,health care,add health job,4
+30196,2047,239,health care,add health job,4
+30196,2048,243,health care,add health job,4
+30196,2049,248,health care,add health job,4
+30196,2050,253,health care,add health job,4
+31130,2020,20,gov,gov,3
+31130,2021,20,gov,gov,3
+31130,2022,21,gov,gov,3
+31130,2023,21,gov,gov,3
+31130,2024,21,gov,gov,3
+31130,2025,22,gov,gov,3
+31130,2026,22,gov,gov,3
+31130,2027,22,gov,gov,3
+31130,2028,23,gov,gov,3
+31130,2029,23,gov,gov,3
+31130,2030,23,gov,gov,3
+31130,2031,24,gov,gov,3
+31130,2032,24,gov,gov,3
+31130,2033,25,gov,gov,3
+31130,2034,25,gov,gov,3
+31130,2035,26,gov,gov,3
+31130,2036,26,gov,gov,3
+31130,2037,26,gov,gov,3
+31130,2038,27,gov,gov,3
+31130,2039,27,gov,gov,3
+31130,2040,28,gov,gov,3
+31130,2041,28,gov,gov,3
+31130,2042,29,gov,gov,3
+31130,2043,29,gov,gov,3
+31130,2044,30,gov,gov,3
+31130,2045,30,gov,gov,3
+31130,2046,31,gov,gov,3
+31130,2047,31,gov,gov,3
+31130,2048,32,gov,gov,3
+31130,2049,32,gov,gov,3
+31130,2050,33,gov,gov,3
+48882,2020,12,"whole sale, transport","whole sale, transport",10
+48882,2021,13,"whole sale, transport","whole sale, transport",10
+48882,2022,13,"whole sale, transport","whole sale, transport",10
+48882,2023,13,"whole sale, transport","whole sale, transport",10
+48882,2024,13,"whole sale, transport","whole sale, transport",10
+48882,2025,14,"whole sale, transport","whole sale, transport",10
+48882,2026,14,"whole sale, transport","whole sale, transport",10
+48882,2027,14,"whole sale, transport","whole sale, transport",10
+48882,2028,14,"whole sale, transport","whole sale, transport",10
+48882,2029,14,"whole sale, transport","whole sale, transport",10
+48882,2030,15,"whole sale, transport","whole sale, transport",10
+48882,2031,15,"whole sale, transport","whole sale, transport",10
+48882,2032,15,"whole sale, transport","whole sale, transport",10
+48882,2033,15,"whole sale, transport","whole sale, transport",10
+48882,2034,16,"whole sale, transport","whole sale, transport",10
+48882,2035,16,"whole sale, transport","whole sale, transport",10
+48882,2036,16,"whole sale, transport","whole sale, transport",10
+48882,2037,16,"whole sale, transport","whole sale, transport",10
+48882,2038,17,"whole sale, transport","whole sale, transport",10
+48882,2039,17,"whole sale, transport","whole sale, transport",10
+48882,2040,17,"whole sale, transport","whole sale, transport",10
+48882,2041,18,"whole sale, transport","whole sale, transport",10
+48882,2042,18,"whole sale, transport","whole sale, transport",10
+48882,2043,18,"whole sale, transport","whole sale, transport",10
+48882,2044,19,"whole sale, transport","whole sale, transport",10
+48882,2045,19,"whole sale, transport","whole sale, transport",10
+48882,2046,19,"whole sale, transport","whole sale, transport",10
+48882,2047,19,"whole sale, transport","whole sale, transport",10
+48882,2048,20,"whole sale, transport","whole sale, transport",10
+48882,2049,20,"whole sale, transport","whole sale, transport",10
+48882,2050,20,"whole sale, transport","whole sale, transport",10
+35327,2020,13,"Accomendation,food","Accomendation,food",1
+35327,2021,14,"Accomendation,food","Accomendation,food",1
+35327,2022,14,"Accomendation,food","Accomendation,food",1
+35327,2023,14,"Accomendation,food","Accomendation,food",1
+35327,2024,14,"Accomendation,food","Accomendation,food",1
+35327,2025,15,"Accomendation,food","Accomendation,food",1
+35327,2026,15,"Accomendation,food","Accomendation,food",1
+35327,2027,15,"Accomendation,food","Accomendation,food",1
+35327,2028,15,"Accomendation,food","Accomendation,food",1
+35327,2029,16,"Accomendation,food","Accomendation,food",1
+35327,2030,16,"Accomendation,food","Accomendation,food",1
+35327,2031,16,"Accomendation,food","Accomendation,food",1
+35327,2032,16,"Accomendation,food","Accomendation,food",1
+35327,2033,17,"Accomendation,food","Accomendation,food",1
+35327,2034,17,"Accomendation,food","Accomendation,food",1
+35327,2035,17,"Accomendation,food","Accomendation,food",1
+35327,2036,17,"Accomendation,food","Accomendation,food",1
+35327,2037,18,"Accomendation,food","Accomendation,food",1
+35327,2038,18,"Accomendation,food","Accomendation,food",1
+35327,2039,18,"Accomendation,food","Accomendation,food",1
+35327,2040,19,"Accomendation,food","Accomendation,food",1
+35327,2041,19,"Accomendation,food","Accomendation,food",1
+35327,2042,19,"Accomendation,food","Accomendation,food",1
+35327,2043,20,"Accomendation,food","Accomendation,food",1
+35327,2044,20,"Accomendation,food","Accomendation,food",1
+35327,2045,20,"Accomendation,food","Accomendation,food",1
+35327,2046,21,"Accomendation,food","Accomendation,food",1
+35327,2047,21,"Accomendation,food","Accomendation,food",1
+35327,2048,21,"Accomendation,food","Accomendation,food",1
+35327,2049,22,"Accomendation,food","Accomendation,food",1
+35327,2050,22,"Accomendation,food","Accomendation,food",1
+35327,2020,13,gov,gov,3
+35327,2021,13,gov,gov,3
+35327,2022,13,gov,gov,3
+35327,2023,13,gov,gov,3
+35327,2024,14,gov,gov,3
+35327,2025,14,gov,gov,3
+35327,2026,14,gov,gov,3
+35327,2027,14,gov,gov,3
+35327,2028,14,gov,gov,3
+35327,2029,15,gov,gov,3
+35327,2030,15,gov,gov,3
+35327,2031,15,gov,gov,3
+35327,2032,15,gov,gov,3
+35327,2033,16,gov,gov,3
+35327,2034,16,gov,gov,3
+35327,2035,16,gov,gov,3
+35327,2036,17,gov,gov,3
+35327,2037,17,gov,gov,3
+35327,2038,17,gov,gov,3
+35327,2039,17,gov,gov,3
+35327,2040,18,gov,gov,3
+35327,2041,18,gov,gov,3
+35327,2042,18,gov,gov,3
+35327,2043,19,gov,gov,3
+35327,2044,19,gov,gov,3
+35327,2045,19,gov,gov,3
+35327,2046,19,gov,gov,3
+35327,2047,20,gov,gov,3
+35327,2048,20,gov,gov,3
+35327,2049,20,gov,gov,3
+35327,2050,21,gov,gov,3
+35327,2020,16,Other,Other,7
+35327,2021,17,Other,Other,7
+35327,2022,17,Other,Other,7
+35327,2023,17,Other,Other,7
+35327,2024,18,Other,Other,7
+35327,2025,18,Other,Other,7
+35327,2026,18,Other,Other,7
+35327,2027,18,Other,Other,7
+35327,2028,19,Other,Other,7
+35327,2029,19,Other,Other,7
+35327,2030,19,Other,Other,7
+35327,2031,20,Other,Other,7
+35327,2032,20,Other,Other,7
+35327,2033,20,Other,Other,7
+35327,2034,21,Other,Other,7
+35327,2035,21,Other,Other,7
+35327,2036,21,Other,Other,7
+35327,2037,22,Other,Other,7
+35327,2038,22,Other,Other,7
+35327,2039,23,Other,Other,7
+35327,2040,23,Other,Other,7
+35327,2041,23,Other,Other,7
+35327,2042,24,Other,Other,7
+35327,2043,24,Other,Other,7
+35327,2044,24,Other,Other,7
+35327,2045,25,Other,Other,7
+35327,2046,25,Other,Other,7
+35327,2047,26,Other,Other,7
+35327,2048,26,Other,Other,7
+35327,2049,27,Other,Other,7
+35327,2050,27,Other,Other,7
+48080,2020,115,"whole sale, transport","whole sale, transport",3
+48080,2021,117,"whole sale, transport","whole sale, transport",3
+48080,2022,119,"whole sale, transport","whole sale, transport",3
+48080,2023,121,"whole sale, transport","whole sale, transport",3
+48080,2024,123,"whole sale, transport","whole sale, transport",3
+48080,2025,125,"whole sale, transport","whole sale, transport",3
+48080,2026,127,"whole sale, transport","whole sale, transport",3
+48080,2027,129,"whole sale, transport","whole sale, transport",3
+48080,2028,131,"whole sale, transport","whole sale, transport",3
+48080,2029,134,"whole sale, transport","whole sale, transport",3
+48080,2030,136,"whole sale, transport","whole sale, transport",3
+48080,2031,138,"whole sale, transport","whole sale, transport",3
+48080,2032,140,"whole sale, transport","whole sale, transport",3
+48080,2033,143,"whole sale, transport","whole sale, transport",3
+48080,2034,145,"whole sale, transport","whole sale, transport",3
+48080,2035,147,"whole sale, transport","whole sale, transport",3
+48080,2036,150,"whole sale, transport","whole sale, transport",3
+48080,2037,152,"whole sale, transport","whole sale, transport",3
+48080,2038,155,"whole sale, transport","whole sale, transport",3
+48080,2039,158,"whole sale, transport","whole sale, transport",3
+48080,2040,160,"whole sale, transport","whole sale, transport",3
+48080,2041,163,"whole sale, transport","whole sale, transport",3
+48080,2042,166,"whole sale, transport","whole sale, transport",3
+48080,2043,168,"whole sale, transport","whole sale, transport",3
+48080,2044,171,"whole sale, transport","whole sale, transport",3
+48080,2045,174,"whole sale, transport","whole sale, transport",3
+48080,2046,177,"whole sale, transport","whole sale, transport",3
+48080,2047,180,"whole sale, transport","whole sale, transport",3
+48080,2048,183,"whole sale, transport","whole sale, transport",3
+48080,2049,186,"whole sale, transport","whole sale, transport",3
+48080,2050,189,"whole sale, transport","whole sale, transport",3
+30932,2020,77,"Gov, ed","Gov, ed",3
+30932,2021,78,"Gov, ed","Gov, ed",3
+30932,2022,78,"Gov, ed","Gov, ed",3
+30932,2023,79,"Gov, ed","Gov, ed",3
+30932,2024,79,"Gov, ed","Gov, ed",3
+30932,2025,79,"Gov, ed","Gov, ed",3
+30932,2026,80,"Gov, ed","Gov, ed",3
+30932,2027,80,"Gov, ed","Gov, ed",3
+30932,2028,80,"Gov, ed","Gov, ed",3
+30932,2029,81,"Gov, ed","Gov, ed",3
+30932,2030,81,"Gov, ed","Gov, ed",3
+30932,2031,82,"Gov, ed","Gov, ed",3
+30932,2032,82,"Gov, ed","Gov, ed",3
+30932,2033,83,"Gov, ed","Gov, ed",3
+30932,2034,83,"Gov, ed","Gov, ed",3
+30932,2035,83,"Gov, ed","Gov, ed",3
+30932,2036,84,"Gov, ed","Gov, ed",3
+30932,2037,84,"Gov, ed","Gov, ed",3
+30932,2038,85,"Gov, ed","Gov, ed",3
+30932,2039,85,"Gov, ed","Gov, ed",3
+30932,2040,85,"Gov, ed","Gov, ed",3
+30932,2041,86,"Gov, ed","Gov, ed",3
+30932,2042,86,"Gov, ed","Gov, ed",3
+30932,2043,87,"Gov, ed","Gov, ed",3
+30932,2044,87,"Gov, ed","Gov, ed",3
+30932,2045,88,"Gov, ed","Gov, ed",3
+30932,2046,88,"Gov, ed","Gov, ed",3
+30932,2047,88,"Gov, ed","Gov, ed",3
+30932,2048,89,"Gov, ed","Gov, ed",3
+30932,2049,89,"Gov, ed","Gov, ed",3
+30932,2050,90,"Gov, ed","Gov, ed",3
+30574,2020,53,"Gov, ed","Gov, ed",3
+30574,2021,53,"Gov, ed","Gov, ed",3
+30574,2022,53,"Gov, ed","Gov, ed",3
+30574,2023,53,"Gov, ed","Gov, ed",3
+30574,2024,54,"Gov, ed","Gov, ed",3
+30574,2025,54,"Gov, ed","Gov, ed",3
+30574,2026,54,"Gov, ed","Gov, ed",3
+30574,2027,55,"Gov, ed","Gov, ed",3
+30574,2028,55,"Gov, ed","Gov, ed",3
+30574,2029,55,"Gov, ed","Gov, ed",3
+30574,2030,55,"Gov, ed","Gov, ed",3
+30574,2031,56,"Gov, ed","Gov, ed",3
+30574,2032,56,"Gov, ed","Gov, ed",3
+30574,2033,56,"Gov, ed","Gov, ed",3
+30574,2034,56,"Gov, ed","Gov, ed",3
+30574,2035,57,"Gov, ed","Gov, ed",3
+30574,2036,57,"Gov, ed","Gov, ed",3
+30574,2037,57,"Gov, ed","Gov, ed",3
+30574,2038,58,"Gov, ed","Gov, ed",3
+30574,2039,58,"Gov, ed","Gov, ed",3
+30574,2040,58,"Gov, ed","Gov, ed",3
+30574,2041,58,"Gov, ed","Gov, ed",3
+30574,2042,59,"Gov, ed","Gov, ed",3
+30574,2043,59,"Gov, ed","Gov, ed",3
+30574,2044,59,"Gov, ed","Gov, ed",3
+30574,2045,60,"Gov, ed","Gov, ed",3
+30574,2046,60,"Gov, ed","Gov, ed",3
+30574,2047,60,"Gov, ed","Gov, ed",3
+30574,2048,61,"Gov, ed","Gov, ed",3
+30574,2049,61,"Gov, ed","Gov, ed",3
+30574,2050,61,"Gov, ed","Gov, ed",3
+56561,2020,52,health care,health care,4
+56561,2021,53,health care,health care,4
+56561,2022,53,health care,health care,4
+56561,2023,53,health care,health care,4
+56561,2024,54,health care,health care,4
+56561,2025,54,health care,health care,4
+56561,2026,54,health care,health care,4
+56561,2027,54,health care,health care,4
+56561,2028,55,health care,health care,4
+56561,2029,55,health care,health care,4
+56561,2030,55,health care,health care,4
+56561,2031,55,health care,health care,4
+56561,2032,56,health care,health care,4
+56561,2033,56,health care,health care,4
+56561,2034,56,health care,health care,4
+56561,2035,57,health care,health care,4
+56561,2036,57,health care,health care,4
+56561,2037,57,health care,health care,4
+56561,2038,57,health care,health care,4
+56561,2039,58,health care,health care,4
+56561,2040,58,health care,health care,4
+56561,2041,58,health care,health care,4
+56561,2042,59,health care,health care,4
+56561,2043,59,health care,health care,4
+56561,2044,59,health care,health care,4
+56561,2045,59,health care,health care,4
+56561,2046,60,health care,health care,4
+56561,2047,60,health care,health care,4
+56561,2048,60,health care,health care,4
+56561,2049,61,health care,health care,4
+56561,2050,61,health care,health care,4
+56562,2020,18,health care,health care,4
+56562,2021,18,health care,health care,4
+56562,2022,18,health care,health care,4
+56562,2023,18,health care,health care,4
+56562,2024,18,health care,health care,4
+56562,2025,18,health care,health care,4
+56562,2026,18,health care,health care,4
+56562,2027,18,health care,health care,4
+56562,2028,18,health care,health care,4
+56562,2029,18,health care,health care,4
+56562,2030,18,health care,health care,4
+56562,2031,19,health care,health care,4
+56562,2032,19,health care,health care,4
+56562,2033,19,health care,health care,4
+56562,2034,19,health care,health care,4
+56562,2035,19,health care,health care,4
+56562,2036,19,health care,health care,4
+56562,2037,19,health care,health care,4
+56562,2038,19,health care,health care,4
+56562,2039,19,health care,health care,4
+56562,2040,19,health care,health care,4
+56562,2041,19,health care,health care,4
+56562,2042,20,health care,health care,4
+56562,2043,20,health care,health care,4
+56562,2044,20,health care,health care,4
+56562,2045,20,health care,health care,4
+56562,2046,20,health care,health care,4
+56562,2047,20,health care,health care,4
+56562,2048,20,health care,health care,4
+56562,2049,20,health care,health care,4
+56562,2050,20,health care,health care,4
+28160,2020,53,office,office,6
+28160,2021,53,office,office,6
+28160,2022,54,office,office,6
+28160,2023,55,office,office,6
+28160,2024,55,office,office,6
+28160,2025,56,office,office,6
+28160,2026,56,office,office,6
+28160,2027,57,office,office,6
+28160,2028,57,office,office,6
+28160,2029,58,office,office,6
+28160,2030,58,office,office,6
+28160,2031,59,office,office,6
+28160,2032,60,office,office,6
+28160,2033,60,office,office,6
+28160,2034,61,office,office,6
+28160,2035,61,office,office,6
+28160,2036,62,office,office,6
+28160,2037,63,office,office,6
+28160,2038,63,office,office,6
+28160,2039,64,office,office,6
+28160,2040,65,office,office,6
+28160,2041,65,office,office,6
+28160,2042,66,office,office,6
+28160,2043,67,office,office,6
+28160,2044,67,office,office,6
+28160,2045,68,office,office,6
+28160,2046,69,office,office,6
+28160,2047,69,office,office,6
+28160,2048,70,office,office,6
+28160,2049,71,office,office,6
+28160,2050,71,office,office,6
+49257,2020,11,"Gov, ed","Gov, ed",3
+49257,2021,11,"Gov, ed","Gov, ed",3
+49257,2022,11,"Gov, ed","Gov, ed",3
+49257,2023,11,"Gov, ed","Gov, ed",3
+49257,2024,12,"Gov, ed","Gov, ed",3
+49257,2025,12,"Gov, ed","Gov, ed",3
+49257,2026,12,"Gov, ed","Gov, ed",3
+49257,2027,12,"Gov, ed","Gov, ed",3
+49257,2028,12,"Gov, ed","Gov, ed",3
+49257,2029,13,"Gov, ed","Gov, ed",3
+49257,2030,13,"Gov, ed","Gov, ed",3
+49257,2031,13,"Gov, ed","Gov, ed",3
+49257,2032,13,"Gov, ed","Gov, ed",3
+49257,2033,13,"Gov, ed","Gov, ed",3
+49257,2034,14,"Gov, ed","Gov, ed",3
+49257,2035,14,"Gov, ed","Gov, ed",3
+49257,2036,14,"Gov, ed","Gov, ed",3
+49257,2037,14,"Gov, ed","Gov, ed",3
+49257,2038,14,"Gov, ed","Gov, ed",3
+49257,2039,15,"Gov, ed","Gov, ed",3
+49257,2040,15,"Gov, ed","Gov, ed",3
+49257,2041,15,"Gov, ed","Gov, ed",3
+49257,2042,15,"Gov, ed","Gov, ed",3
+49257,2043,15,"Gov, ed","Gov, ed",3
+49257,2044,16,"Gov, ed","Gov, ed",3
+49257,2045,16,"Gov, ed","Gov, ed",3
+49257,2046,16,"Gov, ed","Gov, ed",3
+49257,2047,16,"Gov, ed","Gov, ed",3
+49257,2048,17,"Gov, ed","Gov, ed",3
+49257,2049,17,"Gov, ed","Gov, ed",3
+49257,2050,17,"Gov, ed","Gov, ed",3
+4187,2020,10,health care,health care,4
+4187,2021,10,health care,health care,4
+4187,2022,10,health care,health care,4
+4187,2023,10,health care,health care,4
+4187,2024,10,health care,health care,4
+4187,2025,10,health care,health care,4
+4187,2026,11,health care,health care,4
+4187,2027,11,health care,health care,4
+4187,2028,11,health care,health care,4
+4187,2029,11,health care,health care,4
+4187,2030,11,health care,health care,4
+4187,2031,11,health care,health care,4
+4187,2032,12,health care,health care,4
+4187,2033,12,health care,health care,4
+4187,2034,12,health care,health care,4
+4187,2035,12,health care,health care,4
+4187,2036,12,health care,health care,4
+4187,2037,12,health care,health care,4
+4187,2038,13,health care,health care,4
+4187,2039,13,health care,health care,4
+4187,2040,13,health care,health care,4
+4187,2041,13,health care,health care,4
+4187,2042,13,health care,health care,4
+4187,2043,14,health care,health care,4
+4187,2044,14,health care,health care,4
+4187,2045,14,health care,health care,4
+4187,2046,14,health care,health care,4
+4187,2047,14,health care,health care,4
+4187,2048,15,health care,health care,4
+4187,2049,15,health care,health care,4
+4187,2050,15,health care,health care,4
+39588,2024,200,Hotel,Hotel,6
+2800,2020,1,gov,gov,3
+2800,2021,1,gov,gov,3
+2800,2022,1,gov,gov,3
+2800,2023,1,gov,gov,3
+2800,2024,1,gov,gov,3
+2800,2025,1,gov,gov,3
+2800,2026,1,gov,gov,3
+2800,2027,1,gov,gov,3
+2800,2028,1,gov,gov,3
+2800,2029,1,gov,gov,3
+2800,2030,1,gov,gov,3
+2800,2031,1,gov,gov,3
+2800,2032,1,gov,gov,3
+2800,2033,1,gov,gov,3
+2800,2034,1,gov,gov,3
+2800,2035,1,gov,gov,3
+2800,2036,1,gov,gov,3
+2800,2037,1,gov,gov,3
+2800,2038,1,gov,gov,3
+2800,2039,1,gov,gov,3
+2800,2040,1,gov,gov,3
+2800,2041,1,gov,gov,3
+2800,2042,1,gov,gov,3
+2800,2043,1,gov,gov,3
+2800,2044,1,gov,gov,3
+2800,2045,1,gov,gov,3
+2800,2046,1,gov,gov,3
+2800,2047,1,gov,gov,3
+2800,2048,1,gov,gov,3
+2800,2049,1,gov,gov,3
+2800,2050,1,gov,gov,3
+13331,2020,30,edu,edu,3
+13331,2021,30,edu,edu,3
+13331,2022,31,edu,edu,3
+13331,2023,31,edu,edu,3
+13331,2024,31,edu,edu,3
+13331,2025,32,edu,edu,3
+13331,2026,32,edu,edu,3
+13331,2027,32,edu,edu,3
+13331,2028,32,edu,edu,3
+13331,2029,33,edu,edu,3
+13331,2030,33,edu,edu,3
+13331,2031,33,edu,edu,3
+13331,2032,34,edu,edu,3
+13331,2033,34,edu,edu,3
+13331,2034,34,edu,edu,3
+13331,2035,35,edu,edu,3
+13331,2036,35,edu,edu,3
+13331,2037,36,edu,edu,3
+13331,2038,36,edu,edu,3
+13331,2039,36,edu,edu,3
+13331,2040,37,edu,edu,3
+13331,2041,37,edu,edu,3
+13331,2042,37,edu,edu,3
+13331,2043,38,edu,edu,3
+13331,2044,38,edu,edu,3
+13331,2045,38,edu,edu,3
+13331,2046,39,edu,edu,3
+13331,2047,39,edu,edu,3
+13331,2048,40,edu,edu,3
+13331,2049,40,edu,edu,3
+13331,2050,40,edu,edu,3
+30343,2020,13,health care,health care,4
+30343,2021,13,health care,health care,4
+30343,2022,13,health care,health care,4
+30343,2023,13,health care,health care,4
+30343,2024,13,health care,health care,4
+30343,2025,13,health care,health care,4
+30343,2026,13,health care,health care,4
+30343,2027,14,health care,health care,4
+30343,2028,14,health care,health care,4
+30343,2029,14,health care,health care,4
+30343,2030,14,health care,health care,4
+30343,2031,14,health care,health care,4
+30343,2032,15,health care,health care,4
+30343,2033,15,health care,health care,4
+30343,2034,15,health care,health care,4
+30343,2035,15,health care,health care,4
+30343,2036,15,health care,health care,4
+30343,2037,15,health care,health care,4
+30343,2038,16,health care,health care,4
+30343,2039,16,health care,health care,4
+30343,2040,16,health care,health care,4
+30343,2041,16,health care,health care,4
+30343,2042,16,health care,health care,4
+30343,2043,17,health care,health care,4
+30343,2044,17,health care,health care,4
+30343,2045,17,health care,health care,4
+30343,2046,17,health care,health care,4
+30343,2047,17,health care,health care,4
+30343,2048,18,health care,health care,4
+30343,2049,18,health care,health care,4
+30343,2050,18,health care,health care,4
+45367,2020,35,Manufactering,Manufactering,5
+45367,2021,35,Manufactering,Manufactering,5
+45367,2022,36,Manufactering,Manufactering,5
+45367,2023,36,Manufactering,Manufactering,5
+45367,2024,36,Manufactering,Manufactering,5
+45367,2025,37,Manufactering,Manufactering,5
+45367,2026,37,Manufactering,Manufactering,5
+45367,2027,38,Manufactering,Manufactering,5
+45367,2028,38,Manufactering,Manufactering,5
+45367,2029,38,Manufactering,Manufactering,5
+45367,2030,39,Manufactering,Manufactering,5
+45367,2031,39,Manufactering,Manufactering,5
+45367,2032,39,Manufactering,Manufactering,5
+45367,2033,40,Manufactering,Manufactering,5
+45367,2034,40,Manufactering,Manufactering,5
+45367,2035,41,Manufactering,Manufactering,5
+45367,2036,41,Manufactering,Manufactering,5
+45367,2037,41,Manufactering,Manufactering,5
+45367,2038,42,Manufactering,Manufactering,5
+45367,2039,42,Manufactering,Manufactering,5
+45367,2040,43,Manufactering,Manufactering,5
+45367,2041,43,Manufactering,Manufactering,5
+45367,2042,44,Manufactering,Manufactering,5
+45367,2043,44,Manufactering,Manufactering,5
+45367,2044,44,Manufactering,Manufactering,5
+45367,2045,45,Manufactering,Manufactering,5
+45367,2046,45,Manufactering,Manufactering,5
+45367,2047,46,Manufactering,Manufactering,5
+45367,2048,46,Manufactering,Manufactering,5
+45367,2049,47,Manufactering,Manufactering,5
+45367,2050,47,Manufactering,Manufactering,5
