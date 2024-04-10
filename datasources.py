@@ -424,13 +424,13 @@ def zoning_baseline(store, settings, year):
         df2 = df2.drop(['year','max_dua_x','max_far_x','type1_x','type2_x','type3_x','type4_x','type5_x','type6_x','type7_x','type8_x'], axis=1)
         df2.max_height = 999
         
-        if os.path.exists(os.path.join(misc.data_dir(), "developableparcels.dbf")):
-            devbuffer = wfrc_utils.dbf2df(os.path.join(misc.data_dir(), "developableparcels.dbf"))
-            undevbuffer = devbuffer.parcel_id.unique()
-            df2.type1[df2.index.isin(undevbuffer)] = 0
-            df2.type2[df2.index.isin(undevbuffer)] = 0
-            df2.type4[df2.index.isin(undevbuffer)] = 0
-            df2.type5[df2.index.isin(undevbuffer)] = 0
+        if os.path.exists(os.path.join('UtilityRestriction/Outputs', "restricted_parcels.csv")):
+            restricted_parcel_table = pd.read_csv(os.path.join('UtilityRestriction/Outputs', "restricted_parcels.csv"))
+            restricted_ids = restricted_parcel_table.parcel_id.unique()
+            df2.type1[df2.index.isin(restricted_ids)] = 0
+            df2.type2[df2.index.isin(restricted_ids)] = 0
+            df2.type4[df2.index.isin(restricted_ids)] = 0
+            df2.type5[df2.index.isin(restricted_ids)] = 0
         return df2
     else:
         df.max_height = 999

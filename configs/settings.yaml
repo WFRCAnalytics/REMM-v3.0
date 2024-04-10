@@ -5,7 +5,7 @@ aggregation_tables:
 remm:
     base_year: 2019
     end_year: 2051
-    indicator_years: [2019,2020,2025,2030,2035,2040,2045,2050] #[2015,2016,2017,2018,2019,2022,2025,2030,2040,2050]
+    indicator_years: [2019,2020,2023] #[2015,2016,2017,2018,2019,2022,2025,2030,2040,2050]
     
 tdm:
   run_years:
@@ -149,7 +149,7 @@ pusher:
   region: salt lake
 
 
-store: remm_data_2019_base_year_20230607.h5
+store: remm_data_2019_base_year_20240409.h5
 
 
 scenario: baseline

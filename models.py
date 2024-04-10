@@ -3,7 +3,7 @@ import time
 import datetime
 import string
 import os
-import _pickle as pickle
+import pickle as pickle
 import utils as wfrc_utils
 import orca_wfrc.orca as sim
 from simpledbf import Dbf5
@@ -1069,19 +1069,12 @@ def non_residential_developer(feasibility, jobs_weber, buildings_weber, building
 @sim.step("indicator_export")
 def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, distsml, year, summary, run_number, settings):
 
-#    if year > 2011:
-#        f = sim.get_table('feasibility')
-#        f = f['residential']
-#        f.to_pickle("runs/feasibilityyear" + str(year) + ".pkl")
-#        b = buildings.to_frame()
-#        b.to_pickle("runs/buildingyear" + str(year) + ".pkl")
-
-
-    #if year >= 2011:
-
     # if year in [2015,2020,2030,2040,2050]:
     if year in settings['remm']['indicator_years']:
 
+        # create outputs folder
+        if not os.path.exists('REMMRun'):
+            os.makedirs('REMMRun')
 
         households = households.to_frame()
 
@@ -1236,11 +1229,14 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
     # get the base year
     base_year = settings['remm']['base_year']
 
+    # create outputs folder
+    if not os.path.exists('REMMRun'):
+        os.makedirs('REMMRun')
+
     # create folder within REMMRun to house outputs
     directory = 'REMMRun/Progression_Metrics'
     if not os.path.exists(directory):
         os.makedirs(directory)
-
 
     # if base year, output data before simulation
     if  year == base_year:
@@ -1382,7 +1378,7 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
     parcels['has_buildings'] = parcels_output_previous['has_buildings']
 
     # identify new buildings and indicate whether development or redevelopment has occurred
-    simulated_buildings = buildings[(buildings.note == 'simulated') & (buildings.year_built == year)]
+    simulated_buildings = buildings[(buildings[note].isin(['simulated', 'pipeline'] == True)) & (buildings.year_built == year)]
     ids = list(set(simulated_buildings ["parcel_id"].to_list()))
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==0)), 'was_developed'] = 1
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==1)), 'was_redeveloped'] = 1
@@ -1842,96 +1838,106 @@ def run_cube(year, settings,store):
             print("Batch file is missing")
         os.chdir(REMMdir)
 
+@sim.step('utility_restriction')
+def utility_restriction(year, settings):
 
+    '''This module aims to safeguard undeveloped green spaces from excessive development by REMM, 
+        particularly in areas lacking adequate infrastructure during the initial forecast years. 
+        Leveraging GeoPandas, it generates a half-mile buffer around developed zones (grids) and 
+        compiles a list of parcel IDs. These parcels are then restricted from developing single-
+        family, multi-family, retail, and office buildings for the current model year.'''
+    
+    import geopandas as gpd
 
+    # only run module every x years
+    base_year = settings['remm']['base_year']
+    end_year = settings['remm']['end_year']
+    year_increment = 3
+    restriction_years = list(range(base_year, end_year + 1, year_increment))
 
-@sim.step('utility_restriction') # update this to use built in arcpy module
-def utility_restriction(year, settings,store):
+    if year in restriction_years:
+        
+        print("--Utility Restriction start")
 
-    try:
-        import arcpy
+        # select which counties to run utility restriction for using their fips code
+        counties_to_restrict = [49]
+        
+        # the coordinate reference system used when geocoding points, 
+        # must match the spatial reference used in the x,y attributes parcel table
+        # NAD83_UTM12N:26912, NAD83_UTAH_CENTRAL:3566
+        crs = 'EPSG:26912' 
+        
+        # read in the parcels
+        p = sim.get_table('parcels').to_frame(['x','y','total_residential_units','total_job_spaces','county_id','grid_id'])
+        
+        # subset to "developed" parcels within the specified counties
+        developed_parcels = p[((p['total_residential_units'] >= 1) | (p['total_job_spaces'] >= 1)) & (p['county_id'].isin(counties_to_restrict) == True)]
 
+        # write the current year.txt file
+        f = open('YEAR.txt', 'w')
+        f.write(str(year))
+        f.close()
 
-        if year%3 == 2:
-        #if year > 0:
-            REMMdir = os.getcwd()
-            b = sim.get_table('parcels').to_frame(['x','y','total_residential_units','total_job_spaces','county_id','gridID'])
-            bdev = b[((b.total_residential_units >= 1) | (b.total_job_spaces >= 1))&(b.county_id == 49)]
-            bdev.to_csv('utahdevelopedparcels.csv')
+        # temporarily change the current directory
+        REMMdir = os.getcwd()
+        os.chdir(os.path.join(REMMdir,"UtilityRestriction"))
+        
+        # create outputs folder
+        if not os.path.exists('Outputs'):
+            os.makedirs('Outputs')
 
-            #write the current year.txt file
-            f = open('YEAR.txt', 'w')
-            f.write(str(year))
-            f.close()
+        # geocode developed parcels to points
+        developed_parcels = gpd.GeoDataFrame(developed_parcels, geometry=gpd.points_from_xy(developed_parcels['x'], developed_parcels['y'], crs=crs)) 
+        developed_parcels.rename({'total_residential_units':'res_units', 'total_job_spaces':'job_spaces'}, axis=1, inplace=True)
+        
+        # sum residential units and job spaces of parcels by their grid id
+        developed_parcels_sum = developed_parcels.groupby('grid_id', as_index=False)[['res_units','job_spaces']].sum()
 
-            os.chdir(os.path.join(REMMdir,"UtilityRestriction"))
+        # read in the grid file and join to the parcel sum table
+        grid = gpd.read_file('utility_restriction_grid.shp')
+        grid = grid.merge(developed_parcels_sum, on='grid_id', how='left')
+        
+        # calculate adjusted units and filter
+        grid['adj_units'] = grid['res_units'] * grid['buff_frict']
+        grid_selection = grid[grid['adj_units'] >= 10].copy()
 
-            print("Utility Restriction start")
+        # buffer the grid subset by 1/2 mile
+        print('--buffering grids...')
+        grid_selection['geometry'] = grid_selection['geometry'].buffer(804.672)
+        grid_selection.to_file(os.path.join('Outputs',f"resdevbuffer_{year}.shp"))
+        
+        # subset parcels to utah county (this may be changed to include other counties in the future)
+        p = p[p['county_id'].isin(counties_to_restrict) == True]
+        p = p.reset_index()
+        
+        # free up some memory
+        del grid
+        del developed_parcels
+        del developed_parcels_sum
+        
+        # using the parcels table, create a geodataframe of the parcel centroids
+        parcel_centroids = gpd.GeoDataFrame(p, geometry=gpd.points_from_xy(p['x'], p['y'], crs=crs))
 
-            arcpy.env.overwriteOutput = True
-
-            devbuilding = r"..\utahdevelopedparcels.csv"
-            tabledir = r"UtilityRestriction.gdb"
-            tableall = r"UtilityRestriction.gdb\utahdevelopeparcels"
-            table = "utahdevelopeparcels"
-
-            arcpy.TableToTable_conversion(devbuilding, tabledir, table)
-
-            spRef = r"projection.prj"
-
-            point = "pointlyr"
-            pointfeature = r"UtilityRestriction.gdb\utahdevpoint"
-            arcpy.MakeXYEventLayer_management(tableall, "x", "y", point, spRef)
-
-            # arcpy.CopyFeatures_management(point,pointfeature)
-            arcpy.FeatureClassToFeatureClass_conversion(point, os.path.dirname(pointfeature),
-                                                        os.path.basename(pointfeature))
-
-            gridSum = r"UtilityRestriction.gdb\gridSum"
-            arcpy.Statistics_analysis(pointfeature, gridSum,
-                                      [["total_residential_units", "SUM"], ["total_job_spaces", "SUM"]], "gridID")
-
-            gridShape = r"UtilityRestriction.gdb\UtahGrid"
-            gridlayer = "grid_lyr"
-            arcpy.MakeFeatureLayer_management(gridShape, gridlayer)
-            arcpy.AddJoin_management(gridlayer, "GRIDID", gridSum, "gridID", "KEEP_ALL")
-            arcpy.CalculateField_management(gridlayer, "UtahGrid.AdjustedUnits",
-                                            "!gridSum.SUM_total_residential_units! * !UtahGrid.BufferFriction!", "PYTHON3")
-            arcpy.SelectLayerByAttribute_management(gridlayer, "NEW_SELECTION", 'UtahGrid.AdjustedUnits >= 10')
-
-            resdevbuffer = r"UtilityRestriction.gdb\resdevbuffer_" + str(year)
-            arcpy.Buffer_analysis(gridlayer, resdevbuffer, "0.5 Miles", "FULL", "ROUND", "ALL")
-
-            utahparcels = r"UtilityRestriction.gdb\utahparcelspoint"
-
-            utahparcelslyr = "utahparcellyr"
-            arcpy.MakeFeatureLayer_management(utahparcels, utahparcelslyr)
-
-
-            arcpy.SelectLayerByLocation_management(utahparcelslyr, "INTERSECT", resdevbuffer)
-            arcpy.SelectLayerByLocation_management(utahparcelslyr, None, None, "", "SWITCH_SELECTION")
-
-            arcpy.TableToTable_conversion(utahparcelslyr, r"..\data", 'developableparcels.dbf')
-
-            print("Utility Restriction end")
-
-            # Check for arcpy module with current environment. if not found, use bat file to look for it
-            #package_name = 'arcpy'
-            #spec = importlib.util.find_spec(package_name)
-            #if spec is None:
-                #print(package_name +" is not installed in this version of python, looking for other version of python on C: Drive")
-            #try:
-                #subprocess.call(r"UtilityRestriction.bat")
-            #except:
-                #print("Did not find arcgis python installation")
-            #else:
-                #import UtilityRestriction
-            os.chdir(REMMdir)
-
-    except:
-
+        # get the points that are not within the developed parcel buffer and export
+        print('--overlaying features...')
+        parcel_centroids = parcel_centroids.overlay(grid_selection, how='difference')
+        
+        # export restricted parcel ids table
+        print('--exporting parcel ids...')
+        parcel_centroids = parcel_centroids[['parcel_id','county_id']].copy()
+        parcel_centroids.to_csv(os.path.join('Outputs','restricted_parcels.csv'))
+        
+        del parcel_centroids
+        del p
+        del grid_selection
+        del base_year
+        del end_year
+        del year_increment
+        del restriction_years
+        print("--Utility Restriction end")
         os.chdir(REMMdir)
-        print("arcpy is not available. Skipping Utility Restriction.")
+
+    
 
 # this if the function for mapping a specific building that we build to a
 # specific building type
