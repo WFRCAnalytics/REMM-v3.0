@@ -13,7 +13,7 @@ sim.run([
         # "preprocess_countycontrol", # prepare county control file
         "utility_restriction",    # run utility restriction for UT County
         "travel_time_import",
-        "pipeline_projects",      # violently assert new buildings in to the buildings table
+        # "pipeline_projects",      # violently assert new buildings in to the buildings table
         "neighborhood_vars",      # neighborhood variables
         "households_transition",  # households transition
         "jobs_transition",        # jobs transition
@@ -50,7 +50,7 @@ sim.run([
         "elcm_simulate_slc",  # employment location choice Salt Lake County
         "clear_cache",
         "indicator_export",
-        #'progression_metrics_export',
+        # 'progression_metrics_export',
         "travel_model_export_no_construction",  # export travel model inputs at TAZ level in specified years
         "travel_model_export_no_construction_TAZ900",  # export travel model inputs at TAZ level in specified years
         "garbage_collect",

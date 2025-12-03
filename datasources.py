@@ -395,7 +395,7 @@ def zoning_baseline(store, settings, year):
         update = pd.read_csv(os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p.csv"))
         update = update[update.year<=year]
         update = update.sort_values(by='year', ascending=1)
-        update = update.drop_duplicates("parcel_id","last")
+        update = update.drop_duplicates(subset="parcel_id",keep="last")
         if update.empty:
             df.max_height = 999
             return df

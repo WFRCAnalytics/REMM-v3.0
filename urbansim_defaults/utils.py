@@ -569,7 +569,8 @@ def full_transition(agents, agent_controls, year, settings, location_fname):
             jobs = pipelineJobs['jobs'][ind]
             if yearT == year:
                 for x in range(0, jobs):
-                    hh = hh.append({'building_id': building_id, 'cid': cid, 'sector_id': sector_id}, ignore_index=True)
+                    new_row = pd.DataFrame([{'building_id': building_id, 'cid': cid,'sector_id': sector_id}])
+                    hh = pd.concat([hh, new_row], ignore_index=True)
 
     print ("Total agents before transition: {}".format(len(hh)))
     tran = transition.TabularTotalsTransition(ct, settings['total_column'])

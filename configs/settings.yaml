@@ -3,13 +3,12 @@ aggregation_tables:
   - zones
 
 remm:
-    base_year: 2019
-    end_year: 2051
-    indicator_years: [2019,2020,2023] #[2015,2016,2017,2018,2019,2022,2025,2030,2040,2050]
+    base_year: 2023
+    end_year: 2024
+    indicator_years: [2023] 
     
 tdm:
   run_years:
-    - 2019
     - 2023
     - 2028
     - 2032
@@ -149,7 +148,7 @@ pusher:
   region: salt lake
 
 
-store: remm_data_2019_base_year_20240409.h5
+store: remm_data_base_year_2023_20251202.h5
 
 
 scenario: baseline

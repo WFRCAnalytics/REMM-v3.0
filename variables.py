@@ -20,10 +20,16 @@ def ave_sqft_per_unit(parcels, nodes, settings, zoning_baseline):
         return pd.Series(index=parcels.index)
     s = misc.reindex(nodes.ave_sqft_per_unit, parcels.node_id)
     clip = settings.get("ave_sqft_per_unit_clip", None)
+    
     if clip is not None:
+        # Combine the main DataFrame with the type2 information from the baseline zoning
         s = pd.concat([s, zoning_baseline.type2], axis=1)
-        s.right[s.type2==1] = s.right[s.type2==1].clip(lower=clip['lower'], upper=clip['mf_upper'])
-        s.right[s.type2==0] = s.right[s.type2==0].clip(lower=clip['lower'], upper=clip['sf_upper'])
+
+        # Create a Series that holds the upper limit for each row based on building type
+        s_upper = s['type2'].map({1: clip['mf_upper'], 0: clip['sf_upper']})
+
+        # Clip the 'right' column for all rows at once
+        s['right'] = s['right'].clip(lower=clip['lower'], upper=s_upper)
          
     return s.right.fillna(clip['lower'])
 
@@ -2465,8 +2471,8 @@ def distsml_id(households, buildings):
 
 @sim.column('households', 'income_quartile')
 def income_quartile(households):
-    #q = pd.Series(pd.cut(households.income, [0,33060,59300,91940,1000000], labels=[1,2,3,4],), index=households.index).fillna(1)
-    q = pd.Series(pd.cut(households.income, [0,45356,75193,126470,1200000], labels=[1,2,3,4],), index=households.index).fillna(1)
+    #q = pd.Series(pd.cut(households.income, [0,3306540,59300,91940,1000000], labels=[1,2,3,4],), index=households.index).fillna(1)
+    q = pd.Series(pd.cut(households.income, [0,54000,96000,150000,1800000], labels=[1,2,3,4],), index=households.index).fillna(1)
     return q.astype('int')
 
 @sim.column('households', 'b_year_built')
@@ -2501,7 +2507,7 @@ def proportion_workers(households_for_estimation):
 
 @sim.column('households_for_estimation', 'income_quartile', cache=True)
 def income_quartile(households_for_estimation):
-    q = pd.Series(pd.cut(households_for_estimation.income, [0,45356,75193,126470,1200000], labels=[1,2,3,4],), index=households_for_estimation.index).fillna(1)
+    q = pd.Series(pd.cut(households_for_estimation.income, [0,54000,96000,150000,1800000], labels=[1,2,3,4],), index=households_for_estimation.index).fillna(1)
     return q.astype('int')
     
 #########################

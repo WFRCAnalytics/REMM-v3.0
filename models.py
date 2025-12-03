@@ -1378,7 +1378,7 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
     parcels['has_buildings'] = parcels_output_previous['has_buildings']
 
     # identify new buildings and indicate whether development or redevelopment has occurred
-    simulated_buildings = buildings[(buildings[note].isin(['simulated', 'pipeline'] == True)) & (buildings.year_built == year)]
+    simulated_buildings = buildings[(buildings['note'].isin(['simulated', 'pipeline'] == True)) & (buildings.year_built == year)]
     ids = list(set(simulated_buildings ["parcel_id"].to_list()))
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==0)), 'was_developed'] = 1
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==1)), 'was_redeveloped'] = 1
@@ -1501,189 +1501,229 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
 
 @sim.step('travel_model_export_no_construction')
 def travel_model_export_no_constuction(year, settings, jobs, households, buildings, parcels):
+    # ---------------------------------------------------------------
+    # 1. INITIALIZE TDM OUTPUT
+    # ---------------------------------------------------------------
     households = households.to_frame()
     jobs = jobs.to_frame()
-    tdm_output = pd.read_csv("data/tdm_template.csv",index_col = ";TAZID")
-    tdm_output['TOTHH'] = households.groupby("zone_id").building_id.count()
-    tdm_output['HHPOP'] = households.groupby("zone_id").persons.sum()
-    tdm_output['RETL'] = jobs[jobs.sector_id==9].groupby("zone_id").building_id.count()
-    tdm_output['FOOD'] = jobs[jobs.sector_id==1].groupby("zone_id").building_id.count()
-    tdm_output['MANU'] = jobs[jobs.sector_id==5].groupby("zone_id").building_id.count()
-    tdm_output['WSLE'] = jobs[jobs.sector_id==10].groupby("zone_id").building_id.count()
-    tdm_output['OFFI'] = jobs[jobs.sector_id==6].groupby("zone_id").building_id.count()
-    tdm_output['GVED'] = jobs[jobs.sector_id==3].groupby("zone_id").building_id.count()
-    tdm_output['HLTH'] = jobs[jobs.sector_id==4].groupby("zone_id").building_id.count()
-    tdm_output['OTHR'] = jobs[jobs.sector_id==7].groupby("zone_id").building_id.count()
+    tdm_output = pd.read_csv("data/tdm_template.csv", index_col=';TAZID')
+
+    # Household counts and population
+    tdm_output['TOTHH'] = households.groupby("zone_id")["building_id"].count()
+    tdm_output['HHPOP'] = households.groupby("zone_id")["persons"].sum()
+
+    # Employment counts by sector
+    sector_map = {
+        'RETL': 9, 'FOOD': 1, 'MANU': 5, 'WSLE': 10,
+        'OFFI': 6, 'GVED': 3, 'HLTH': 4, 'OTHR': 7
+    }
+
+    for col, sector_id in sector_map.items():
+        tdm_output[col] = jobs[jobs.sector_id == sector_id].groupby("zone_id")["building_id"].count()
+
     tdm_output = tdm_output.fillna(0)
+
+    # ---------------------------------------------------------------
+    # 2. POPULATION CONTROL ADJUSTMENT
+    # ---------------------------------------------------------------
     pop_control = pd.read_csv("data/population_controls.csv")
     pop_control = pop_control[pop_control.year == year]
-    c_pop = tdm_output.groupby("CO_FIPS").HHPOP.sum()
-    c_hh = tdm_output.groupby("CO_FIPS").TOTHH.sum()
-    adjust57 = (pop_control[pop_control.cid == 57].number_of_population.iloc[0] - c_hh[57]) * 1.0 / (
-                c_pop[57] - c_hh[57])
-    adjust11 = (pop_control[pop_control.cid == 11].number_of_population.iloc[0] - c_hh[11]) * 1.0 / (
-                c_pop[11] - c_hh[11])
-    adjust35 = (pop_control[pop_control.cid == 35].number_of_population.iloc[0] - c_hh[35]) * 1.0 / (
-                c_pop[35] - c_hh[35])
-    adjust49 = (pop_control[pop_control.cid == 49].number_of_population.iloc[0] - c_hh[49]) * 1.0 / (
-                c_pop[49] - c_hh[49])
-    zafteradjust = tdm_output.copy()
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]) * adjust57 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]) * adjust11 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]) * adjust35 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]) * adjust49 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]
-    tdm_output = zafteradjust.copy()
 
+    # Compute total households and population by county
+    c_hh = tdm_output.groupby("CO_FIPS")['TOTHH'].sum()
+    c_pop = tdm_output.groupby("CO_FIPS")['HHPOP'].sum()
+
+    # Define per-county adjustment factors
+    adjust_factors = {}
+    for fips in [57, 11, 35, 49]:
+        target_pop = pop_control.loc[pop_control.cid == fips, 'number_of_population'].iloc[0]
+        adjust_factors[fips] = (target_pop - c_hh[fips]) / (c_pop[fips] - c_hh[fips])
+
+    # Apply adjustment safely
+    for fips, factor in adjust_factors.items():
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'HHPOP'] = (
+            (tdm_output.loc[mask, 'HHPOP'] - tdm_output.loc[mask, 'TOTHH']) * factor
+            + tdm_output.loc[mask, 'TOTHH']
+        )
+
+    # ---------------------------------------------------------------
+    # 3. HOME-BASED JOBS (HBJ)
+    # ---------------------------------------------------------------
     employment_control = pd.read_csv("data/employment_controls.csv")
-    #Home-based Job
-    hbj = employment_control[(employment_control.year == year)&(employment_control.sector_id == 12)]
-    zhbj = tdm_output[(tdm_output.TOTHH > 0)]
-    c_hbj_adjust = zhbj.groupby("CO_FIPS").TOTHH.sum()
-    #first adjustment
-    hbj_adjust57 =  (hbj[hbj.cid == 57].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[57]
-    hbj_adjust11 =  (hbj[hbj.cid == 11].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[11]
-    hbj_adjust35 =  (hbj[hbj.cid == 35].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[35]
-    hbj_adjust49 =  (hbj[hbj.cid == 49].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[49]
-    tdm_output["HBJ"] = 0
-    tdm_output.HBJ[tdm_output.CO_FIPS == 57] = tdm_output.TOTHH[tdm_output.CO_FIPS == 57]*hbj_adjust57
-    tdm_output.HBJ[tdm_output.CO_FIPS == 11] = tdm_output.TOTHH[tdm_output.CO_FIPS == 11]*hbj_adjust11
-    tdm_output.HBJ[tdm_output.CO_FIPS == 35] = tdm_output.TOTHH[tdm_output.CO_FIPS == 35]*hbj_adjust35
-    tdm_output.HBJ[tdm_output.CO_FIPS == 49] = tdm_output.TOTHH[tdm_output.CO_FIPS == 49]*hbj_adjust49
-    tdm_output.HBJ = np.round(tdm_output.HBJ)
-    #second adjustment
-    c_hbj_adjust = tdm_output.groupby("CO_FIPS").HBJ.sum()
-    hbj_adjust57 =  (hbj[hbj.cid == 57].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[57]
-    hbj_adjust11 =  (hbj[hbj.cid == 11].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[11]
-    hbj_adjust35 =  (hbj[hbj.cid == 35].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[35]
-    hbj_adjust49 =  (hbj[hbj.cid == 49].number_of_jobs.iloc[0])*1.0/c_hbj_adjust[49]
-    tdm_output.HBJ[tdm_output.CO_FIPS == 57] = tdm_output.HBJ[tdm_output.CO_FIPS == 57]*hbj_adjust57
-    tdm_output.HBJ[tdm_output.CO_FIPS == 11] = tdm_output.HBJ[tdm_output.CO_FIPS == 11]*hbj_adjust11
-    tdm_output.HBJ[tdm_output.CO_FIPS == 35] = tdm_output.HBJ[tdm_output.CO_FIPS == 35]*hbj_adjust35
-    tdm_output.HBJ[tdm_output.CO_FIPS == 49] = tdm_output.HBJ[tdm_output.CO_FIPS == 49]*hbj_adjust49
+    hbj = employment_control[(employment_control.year == year) & (employment_control.sector_id == 12)]
 
-    #Agriculture Job
-    agj = employment_control[(employment_control.year == year)&(employment_control.sector_id == 11)]
+    tdm_output['HBJ'] = 0
+    zhbj = tdm_output[tdm_output['TOTHH'] > 0]
+
+    # First adjustment
+    hbj_adjust = {}
+    for fips in [57, 11, 35, 49]:
+        total_hh = zhbj.groupby("CO_FIPS")['TOTHH'].sum()[fips]
+        hbj_adjust[fips] = hbj.loc[hbj.cid == fips, 'number_of_jobs'].iloc[0] / total_hh
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'HBJ'] = tdm_output.loc[mask, 'TOTHH'] * hbj_adjust[fips]
+
+    tdm_output['HBJ'] = np.round(tdm_output['HBJ'])
+
+    # Second adjustment
+    c_hbj_adjust = tdm_output.groupby("CO_FIPS")['HBJ'].sum()
+    for fips in [57, 11, 35, 49]:
+        mask = tdm_output['CO_FIPS'] == fips
+        factor = hbj.loc[hbj.cid == fips, 'number_of_jobs'].iloc[0] / c_hbj_adjust[fips]
+        tdm_output.loc[mask, 'HBJ'] *= factor
+
+    # ---------------------------------------------------------------
+    # 4. AGRICULTURE JOBS (FM_AGRI)
+    # ---------------------------------------------------------------
+    agj = employment_control[(employment_control.year == year) & (employment_control.sector_id == 11)]
     p = parcels.to_frame(['total_residential_units','total_job_spaces','zone_id','agriculture','shape_area'])
-    pa = p[(p.agriculture == 1) & (p.total_residential_units == 0) & (p.total_residential_units == 0) & (p.zone_id < 3546 )] #3508
-    tdm_output['agr_sqft'] = pa.groupby("zone_id").shape_area.sum()
+
+    pa = p[
+        (p.agriculture == 1) &
+        (p.total_residential_units == 0) &
+        (p.zone_id < 3546)
+    ]
+
+    tdm_output['agr_sqft'] = pa.groupby("zone_id")['shape_area'].sum()
     tdm_output = tdm_output.fillna(0)
-    zagj = tdm_output[(tdm_output.agr_sqft > 0)]
-    c_agj_adjust = zagj.groupby("CO_FIPS").agr_sqft.sum()
-    #first adjustment
-    agj_adjust57 =  (agj[agj.cid == 57].number_of_jobs.iloc[0])*1.0/c_agj_adjust[57]
-    agj_adjust11 =  (agj[agj.cid == 11].number_of_jobs.iloc[0])*1.0/c_agj_adjust[11]
-    agj_adjust35 =  (agj[agj.cid == 35].number_of_jobs.iloc[0])*1.0/c_agj_adjust[35]
-    agj_adjust49 =  (agj[agj.cid == 49].number_of_jobs.iloc[0])*1.0/c_agj_adjust[49]
+
     tdm_output['FM_AGRI'] = 0
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 57] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 57]*agj_adjust57
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 11] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 11]*agj_adjust11
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 35] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 35]*agj_adjust35
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 49] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 49]*agj_adjust49
-    tdm_output.FM_AGRI = np.round(tdm_output.FM_AGRI)
-    #secondadjustment
-    c_agj_adjust = tdm_output.groupby("CO_FIPS").FM_AGRI.sum()
-    agj_adjust57 =  (agj[agj.cid == 57].number_of_jobs.iloc[0])*1.0/c_agj_adjust[57]
-    agj_adjust11 =  (agj[agj.cid == 11].number_of_jobs.iloc[0])*1.0/c_agj_adjust[11]
-    agj_adjust35 =  (agj[agj.cid == 35].number_of_jobs.iloc[0])*1.0/c_agj_adjust[35]
-    agj_adjust49 =  (agj[agj.cid == 49].number_of_jobs.iloc[0])*1.0/c_agj_adjust[49]
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 57] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 57]*agj_adjust57
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 11] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 11]*agj_adjust11
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 35] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 35]*agj_adjust35
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 49] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 49]*agj_adjust49
+    zagj = tdm_output[tdm_output['agr_sqft'] > 0]
 
+    # First adjustment
+    agj_adjust = {}
+    for fips in [57, 11, 35, 49]:
+        total_sqft = zagj.groupby("CO_FIPS")['agr_sqft'].sum()[fips]
+        agj_adjust[fips] = agj.loc[agj.cid == fips, 'number_of_jobs'].iloc[0] / total_sqft
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'FM_AGRI'] = tdm_output.loc[mask, 'agr_sqft'] * agj_adjust[fips]
 
-    #Mining Job
-    mij = employment_control[(employment_control.year == year)&(employment_control.sector_id == 8)]
-    c_mij_adjust = tdm_output.groupby("CO_FIPS").FM_MING.sum()
-    mij_adjust57 =  (mij[mij.cid == 57].number_of_jobs.iloc[0])*1.0/c_mij_adjust[57]
-    mij_adjust11 =  (mij[mij.cid == 11].number_of_jobs.iloc[0])*1.0/c_mij_adjust[11]
-    mij_adjust35 =  (mij[mij.cid == 35].number_of_jobs.iloc[0])*1.0/c_mij_adjust[35]
-    mij_adjust49 =  (mij[mij.cid == 49].number_of_jobs.iloc[0])*1.0/c_mij_adjust[49]
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 57] = tdm_output.FM_MING[tdm_output.CO_FIPS == 57]*mij_adjust57
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 11] = tdm_output.FM_MING[tdm_output.CO_FIPS == 11]*mij_adjust11
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 35] = tdm_output.FM_MING[tdm_output.CO_FIPS == 35]*mij_adjust35
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 49] = tdm_output.FM_MING[tdm_output.CO_FIPS == 49]*mij_adjust49
+    tdm_output['FM_AGRI'] = np.round(tdm_output['FM_AGRI'])
 
-    #tdmoutput
+    # Second adjustment
+    c_agj_adjust = tdm_output.groupby("CO_FIPS")['FM_AGRI'].sum()
+    for fips in [57, 11, 35, 49]:
+        mask = tdm_output['CO_FIPS'] == fips
+        factor = agj.loc[agj.cid == fips, 'number_of_jobs'].iloc[0] / c_agj_adjust[fips]
+        tdm_output.loc[mask, 'FM_AGRI'] *= factor
+
+    # ---------------------------------------------------------------
+    # 5. MINING JOBS (FM_MING)
+    # ---------------------------------------------------------------
+    mij = employment_control[(employment_control.year == year) & (employment_control.sector_id == 8)]
+    c_mij_adjust = tdm_output.groupby("CO_FIPS")['FM_MING'].sum()
+
+    for fips in [57, 11, 35, 49]:
+        factor = mij.loc[mij.cid == fips, 'number_of_jobs'].iloc[0] / c_mij_adjust[fips]
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'FM_MING'] *= factor
+
+    # ---------------------------------------------------------------
+    # 6. HHSIZE
+    # ---------------------------------------------------------------
     tdm_output['HHSIZE'] = 0
-    tdm_output.HHSIZE[tdm_output.TOTHH > 0] = tdm_output.HHPOP[tdm_output.TOTHH > 0]/tdm_output.TOTHH[tdm_output.TOTHH > 0]
+    mask = tdm_output['TOTHH'] > 0
+    tdm_output.loc[mask, 'HHSIZE'] = tdm_output.loc[mask, 'HHPOP'] / tdm_output.loc[mask, 'TOTHH']
 
-    inputdir = settings['tdm']['input_dir'] + '/' # come back to this when gui is farther along
-    if not os.path.exists(inputdir):
-        os.makedirs(inputdir)  
-        
-    filename = "taz832_SE_" + str(year) + ".csv"
+    # ---------------------------------------------------------------
+    # 7. SAVE OUTPUTS
+    # ---------------------------------------------------------------
+    inputdir = settings['tdm']['input_dir'] + '/'
+    os.makedirs(inputdir, exist_ok=True)
+
+    # Main TDM output
+    filename = f"taz832_SE_{year}.csv"
     filepath = os.path.join(inputdir, filename)
-
     tdm_output.to_csv(filepath)
 
+    # Units & Job Spaces output
     buildings = buildings.to_frame(['residential_units','job_spaces','zone_id'])
-    unitfilename =  "UNITS_JOBSPACES_" + str(year) + ".csv"
+    unitfilename = f"UNITS_JOBSPACES_{year}.csv"
     unitfilepath = os.path.join(inputdir, unitfilename)
-    unit_output = tdm_output[['TOTHH','HHPOP']]
-    unit_output['REMMEMP'] = jobs.groupby("zone_id").building_id.count()
-    unit_output['residential_units'] = buildings.groupby("zone_id").residential_units.sum()
-    unit_output['job_spaces'] = buildings.groupby("zone_id").job_spaces.sum()
+
+    unit_output = tdm_output[['TOTHH','HHPOP']].copy()
+    unit_output['REMMEMP'] = jobs.groupby("zone_id")["building_id"].count()
+    unit_output['residential_units'] = buildings.groupby("zone_id")['residential_units'].sum()
+    unit_output['job_spaces'] = buildings.groupby("zone_id")['job_spaces'].sum()
     unit_output = unit_output.fillna(0)
     unit_output.to_csv(unitfilepath)
+
 
 
 @sim.step('travel_model_export_add_construction')
 def travel_model_export_add_constuction(year, settings, jobs, households, buildings, parcels):
 
+    # Convert buildings to DataFrame if needed
     buildings = buildings.to_frame()
-    inputdir = settings['tdm']['input_dir']+'/'
-    filename = "taz832_SE_" + str(year) + ".csv"
+
+    inputdir = settings['tdm']['input_dir'] + '/'
+    filename = f"taz832_SE_{year}.csv"
     filepath = os.path.join(inputdir, filename)
 
-    tdm_output = pd.read_csv(filepath,index_col = ";TAZID")
-
+    tdm_output = pd.read_csv(filepath, index_col=';TAZID')
     employment_control = pd.read_csv("data/employment_controls.csv")
 
-    #Construction Job
-    coj = employment_control[(employment_control.year == year)&(employment_control.sector_id == 2)]
+    # ---------------------------------------------------------------
+    # 1. CONSTRUCTION JOBS: SUM NEW BUILDING SQFT BY ZONE
+    # ---------------------------------------------------------------
+    coj = employment_control[(employment_control.year == year) & (employment_control.sector_id == 2)]
+
+    # Filter buildings for current year (and 'base' note if base year)
     if year == settings['remm']['base_year']:
         cbuilding = buildings[(buildings.year_built == year) & (buildings.note == 'base')]
     else:
         cbuilding = buildings[buildings.year_built == year]
-    tdm_output['new_building_sqft'] = cbuilding.groupby("zone_id").building_sqft.sum()
+
+    # Sum building sqft by zone_id
+    new_building_sqft = cbuilding.groupby("zone_id")["building_sqft"].sum()
+    tdm_output['new_building_sqft'] = new_building_sqft
     tdm_output = tdm_output.fillna(0)
 
-    coj_adjust57 = 1 / 2200
-    coj_adjust11 = 1 / 2200
-    coj_adjust35 = 1 / 2200
-    coj_adjust49 = 1 / 2200
-    tdm_output['FM_CONS'] = 0
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 57] * coj_adjust57
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 11] * coj_adjust11
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 35] * coj_adjust35
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 49] * coj_adjust49
-    tdm_output.FM_CONS = np.round(tdm_output.FM_CONS)
+    # ---------------------------------------------------------------
+    # 2. INITIAL FM_CONS CALCULATION (per-county adjustment)
+    # ---------------------------------------------------------------
+    # Define per-county adjustments
+    coj_adjusts = {
+        57: 1 / 2200,
+        11: 1 / 2200,
+        35: 1 / 2200,
+        49: 1 / 2200
+    }
 
-    # secondadjustment
-    c_coj_adjust = tdm_output.groupby("CO_FIPS").FM_CONS.sum()
-    tdm_output['HHJobs'] = tdm_output['TOTHH'] + tdm_output['RETL'] + tdm_output['FOOD'] + tdm_output['MANU'] + tdm_output['WSLE'] + tdm_output['OFFI'] + tdm_output['GVED']+ tdm_output['HLTH'] + tdm_output['OTHR']
-    c_coj_adjustSE = tdm_output.groupby("CO_FIPS").HHJobs.sum()
-    coj_adjust57 = ((coj[coj.cid == 57].number_of_jobs.iloc[0]) - c_coj_adjust[57]) / c_coj_adjustSE[57]
-    coj_adjust11 = ((coj[coj.cid == 11].number_of_jobs.iloc[0]) - c_coj_adjust[11]) / c_coj_adjustSE[11]
-    coj_adjust35 = ((coj[coj.cid == 35].number_of_jobs.iloc[0]) - c_coj_adjust[35]) / c_coj_adjustSE[35]
-    coj_adjust49 = ((coj[coj.cid == 49].number_of_jobs.iloc[0]) - c_coj_adjust[49]) / c_coj_adjustSE[49]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.HHJobs[tdm_output.CO_FIPS == 57] * coj_adjust57 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 57]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.HHJobs[tdm_output.CO_FIPS == 11] * coj_adjust11 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 11]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.HHJobs[tdm_output.CO_FIPS == 35] * coj_adjust35 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 35]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.HHJobs[tdm_output.CO_FIPS == 49] * coj_adjust49 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 49]
+    tdm_output['FM_CONS'] = 0
+
+    # Apply adjustments per county
+    for fips, adjust in coj_adjusts.items():
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'FM_CONS'] = tdm_output.loc[mask, 'new_building_sqft'] * adjust
+
+    tdm_output['FM_CONS'] = np.round(tdm_output['FM_CONS'])
+
+    # ---------------------------------------------------------------
+    # 3. SECOND ADJUSTMENT BASED ON EMPLOYMENT CONTROL
+    # ---------------------------------------------------------------
+    # Compute total FM_CONS and HHJobs by county
+    c_coj_adjust = tdm_output.groupby("CO_FIPS")['FM_CONS'].sum()
+    tdm_output['HHJobs'] = (
+        tdm_output['TOTHH'] + tdm_output['RETL'] + tdm_output['FOOD'] +
+        tdm_output['MANU'] + tdm_output['WSLE'] + tdm_output['OFFI'] +
+        tdm_output['GVED'] + tdm_output['HLTH'] + tdm_output['OTHR']
+    )
+    c_coj_adjustSE = tdm_output.groupby("CO_FIPS")['HHJobs'].sum()
+
+    # Compute final per-county adjustments
+    final_adjusts = {}
+    for fips in coj_adjusts.keys():
+        target_jobs = coj.loc[coj.cid == fips, 'number_of_jobs'].iloc[0]
+        final_adjusts[fips] = (target_jobs - c_coj_adjust[fips]) / c_coj_adjustSE[fips]
+
+    # Apply the final adjustments per county
+    for fips, adjust in final_adjusts.items():
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'FM_CONS'] += tdm_output.loc[mask, 'HHJobs'] * adjust
+    
+
     # zcoj = tdm_output[(tdm_output.new_building_sqft > 0)]
     # c_coj_adjust = zcoj.groupby("CO_FIPS").new_building_sqft.sum()
     # #firstadjustment
@@ -1992,204 +2032,225 @@ def zone_ind_estimate(zones):
 
 @sim.step('travel_model_export_no_construction_TAZ900')
 def travel_model_export_no_construction_TAZ900(year, settings, jobs, households, buildings, parcels):
+    # ---------------------------------------------------------------
+    # 1. PREPARE DATAFRAMES
+    # ---------------------------------------------------------------
     households = households.to_frame()
     jobs = jobs.to_frame()
-    parcels = parcels.to_frame()
-    parcels = parcels.reset_index()
+    parcels = parcels.to_frame().reset_index()
     parcels['parcel_id_REMM'] = parcels['parcel_id']
-    parcelsTAZ900 = parcels[['parcel_id_REMM','TAZID_900']]
-    households = pd.merge(households, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
-    jobs = pd.merge(jobs, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
+
+    parcelsTAZ900 = parcels[['parcel_id_REMM', 'TAZID_900']]
+    households = pd.merge(households, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM', how='left')
+    jobs = pd.merge(jobs, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM', how='left')
+
+    # ---------------------------------------------------------------
+    # 2. LOAD TDM TEMPLATE AND INITIALIZE COLUMNS
+    # ---------------------------------------------------------------
     tdm_output = pd.read_csv("data/tdm_template_TAZ900.csv", index_col=";TAZID")
-    tdm_output['TOTHH'] = households.groupby("TAZID_900").building_id.count()
-    tdm_output['HHPOP'] = households.groupby("TAZID_900").persons.sum()
-    tdm_output['RETL'] = jobs[jobs.sector_id == 9].groupby("TAZID_900").building_id.count()
-    tdm_output['FOOD'] = jobs[jobs.sector_id == 1].groupby("TAZID_900").building_id.count()
-    tdm_output['MANU'] = jobs[jobs.sector_id == 5].groupby("TAZID_900").building_id.count()
-    tdm_output['WSLE'] = jobs[jobs.sector_id == 10].groupby("TAZID_900").building_id.count()
-    tdm_output['OFFI'] = jobs[jobs.sector_id == 6].groupby("TAZID_900").building_id.count()
-    tdm_output['GVED'] = jobs[jobs.sector_id == 3].groupby("TAZID_900").building_id.count()
-    tdm_output['HLTH'] = jobs[jobs.sector_id == 4].groupby("TAZID_900").building_id.count()
-    tdm_output['OTHR'] = jobs[jobs.sector_id == 7].groupby("TAZID_900").building_id.count()
+    
+    # Households
+    tdm_output['TOTHH'] = households.groupby("TAZID_900")['building_id'].count()
+    tdm_output['HHPOP'] = households.groupby("TAZID_900")['persons'].sum()
+    
+    # Employment by sector
+    sector_map = {
+        'RETL': 9, 'FOOD': 1, 'MANU': 5, 'WSLE': 10,
+        'OFFI': 6, 'GVED': 3, 'HLTH': 4, 'OTHR': 7
+    }
+    for col, sector_id in sector_map.items():
+        tdm_output[col] = jobs[jobs.sector_id == sector_id].groupby("TAZID_900")['building_id'].count()
+    
     tdm_output = tdm_output.fillna(0)
+
+    # ---------------------------------------------------------------
+    # 3. POPULATION ADJUSTMENT (per-county)
+    # ---------------------------------------------------------------
     pop_control = pd.read_csv("data/population_controls.csv")
     pop_control = pop_control[pop_control.year == year]
-    c_pop = tdm_output.groupby("CO_FIPS").HHPOP.sum()
-    c_hh = tdm_output.groupby("CO_FIPS").TOTHH.sum()
-    adjust57 = (pop_control[pop_control.cid == 57].number_of_population.iloc[0] - c_hh[57]) * 1.0 / (
-                c_pop[57] - c_hh[57])
-    adjust11 = (pop_control[pop_control.cid == 11].number_of_population.iloc[0] - c_hh[11]) * 1.0 / (
-                c_pop[11] - c_hh[11])
-    adjust35 = (pop_control[pop_control.cid == 35].number_of_population.iloc[0] - c_hh[35]) * 1.0 / (
-                c_pop[35] - c_hh[35])
-    adjust49 = (pop_control[pop_control.cid == 49].number_of_population.iloc[0] - c_hh[49]) * 1.0 / (
-                c_pop[49] - c_hh[49])
-    zafteradjust = tdm_output.copy()
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]) * adjust57 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]) * adjust11 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]) * adjust35 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]) * adjust49 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]
-    tdm_output = zafteradjust.copy()
 
+    c_pop = tdm_output.groupby("CO_FIPS")['HHPOP'].sum()
+    c_hh = tdm_output.groupby("CO_FIPS")['TOTHH'].sum()
+
+    # Dictionary of county adjustments
+    pop_adjusts = {}
+    for cid in [57, 11, 35, 49]:
+        pop_adjusts[cid] = (pop_control.loc[pop_control.cid == cid, 'number_of_population'].iloc[0] - c_hh[cid]) / (
+                            c_pop[cid] - c_hh[cid])
+
+    # Apply adjustment
+    tdm_output_adj = tdm_output.copy()
+    for cid, adjust in pop_adjusts.items():
+        mask = tdm_output_adj['CO_FIPS'] == cid
+        tdm_output_adj.loc[mask, 'HHPOP'] = (
+            (tdm_output_adj.loc[mask, 'HHPOP'] - tdm_output_adj.loc[mask, 'TOTHH']) * adjust +
+            tdm_output_adj.loc[mask, 'TOTHH']
+        )
+    tdm_output = tdm_output_adj
+
+    # ---------------------------------------------------------------
+    # 4. HOME-BASED JOBS ADJUSTMENT
+    # ---------------------------------------------------------------
     employment_control = pd.read_csv("data/employment_controls.csv")
-    # Home-based Job
     hbj = employment_control[(employment_control.year == year) & (employment_control.sector_id == 12)]
-    zhbj = tdm_output[(tdm_output.TOTHH > 0)]
-    c_hbj_adjust = zhbj.groupby("CO_FIPS").TOTHH.sum()
-    # first adjustment
-    hbj_adjust57 = (hbj[hbj.cid == 57].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[57]
-    hbj_adjust11 = (hbj[hbj.cid == 11].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[11]
-    hbj_adjust35 = (hbj[hbj.cid == 35].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[35]
-    hbj_adjust49 = (hbj[hbj.cid == 49].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[49]
-    tdm_output["HBJ"] = 0
-    tdm_output.HBJ[tdm_output.CO_FIPS == 57] = tdm_output.TOTHH[tdm_output.CO_FIPS == 57] * hbj_adjust57
-    tdm_output.HBJ[tdm_output.CO_FIPS == 11] = tdm_output.TOTHH[tdm_output.CO_FIPS == 11] * hbj_adjust11
-    tdm_output.HBJ[tdm_output.CO_FIPS == 35] = tdm_output.TOTHH[tdm_output.CO_FIPS == 35] * hbj_adjust35
-    tdm_output.HBJ[tdm_output.CO_FIPS == 49] = tdm_output.TOTHH[tdm_output.CO_FIPS == 49] * hbj_adjust49
-    tdm_output.HBJ = np.round(tdm_output.HBJ)
-    # second adjustment
-    c_hbj_adjust = tdm_output.groupby("CO_FIPS").HBJ.sum()
-    hbj_adjust57 = (hbj[hbj.cid == 57].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[57]
-    hbj_adjust11 = (hbj[hbj.cid == 11].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[11]
-    hbj_adjust35 = (hbj[hbj.cid == 35].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[35]
-    hbj_adjust49 = (hbj[hbj.cid == 49].number_of_jobs.iloc[0]) * 1.0 / c_hbj_adjust[49]
-    tdm_output.HBJ[tdm_output.CO_FIPS == 57] = tdm_output.HBJ[tdm_output.CO_FIPS == 57] * hbj_adjust57
-    tdm_output.HBJ[tdm_output.CO_FIPS == 11] = tdm_output.HBJ[tdm_output.CO_FIPS == 11] * hbj_adjust11
-    tdm_output.HBJ[tdm_output.CO_FIPS == 35] = tdm_output.HBJ[tdm_output.CO_FIPS == 35] * hbj_adjust35
-    tdm_output.HBJ[tdm_output.CO_FIPS == 49] = tdm_output.HBJ[tdm_output.CO_FIPS == 49] * hbj_adjust49
 
-    # Agriculture Job
+    zhbj = tdm_output[tdm_output['TOTHH'] > 0]
+    c_hbj_adjust = zhbj.groupby("CO_FIPS")['TOTHH'].sum()
+
+    hbj_adjusts = {cid: (hbj.loc[hbj.cid == cid, 'number_of_jobs'].iloc[0] / c_hbj_adjust[cid]) 
+                   for cid in [57, 11, 35, 49]}
+
+    tdm_output['HBJ'] = 0
+    for cid, adjust in hbj_adjusts.items():
+        mask = tdm_output['CO_FIPS'] == cid
+        tdm_output.loc[mask, 'HBJ'] = tdm_output.loc[mask, 'TOTHH'] * adjust
+
+    # Second adjustment
+    c_hbj_adjust2 = tdm_output.groupby("CO_FIPS")['HBJ'].sum()
+    hbj_adjusts2 = {cid: (hbj.loc[hbj.cid == cid, 'number_of_jobs'].iloc[0] / c_hbj_adjust2[cid])
+                    for cid in [57, 11, 35, 49]}
+
+    for cid, adjust in hbj_adjusts2.items():
+        mask = tdm_output['CO_FIPS'] == cid
+        tdm_output.loc[mask, 'HBJ'] *= adjust
+    tdm_output['HBJ'] = np.round(tdm_output['HBJ'])
+
+    # ---------------------------------------------------------------
+    # 5. AGRICULTURE JOBS ADJUSTMENT
+    # ---------------------------------------------------------------
     agj = employment_control[(employment_control.year == year) & (employment_control.sector_id == 11)]
-    #p = parcels.to_frame(['total_residential_units', 'total_job_spaces', 'zone_id', 'agriculture', 'shape_area'])
-    p = parcels[['total_residential_units', 'total_job_spaces', 'agriculture', 'shape_area', 'TAZID_900']]
-    # pa = p[(p.agriculture == 1) & (p.total_residential_units == 0) & (p.total_residential_units == 0) & (
-    #             p.zone_id != 3546)] #3508
-    pa = p[(p.agriculture == 1) & (p.total_residential_units == 0) & (p.total_residential_units == 0)]
-    tdm_output['agr_sqft'] = pa.groupby("TAZID_900").shape_area.sum()
+
+    pa = parcels[(parcels['agriculture'] == 1) & (parcels['total_residential_units'] == 0)]
+    tdm_output['agr_sqft'] = pa.groupby("TAZID_900")['shape_area'].sum()
     tdm_output = tdm_output.fillna(0)
-    zagj = tdm_output[(tdm_output.agr_sqft > 0)]
-    c_agj_adjust = zagj.groupby("CO_FIPS").agr_sqft.sum()
-    # first adjustment
-    agj_adjust57 = (agj[agj.cid == 57].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[57]
-    agj_adjust11 = (agj[agj.cid == 11].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[11]
-    agj_adjust35 = (agj[agj.cid == 35].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[35]
-    agj_adjust49 = (agj[agj.cid == 49].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[49]
+
+    zagj = tdm_output[tdm_output['agr_sqft'] > 0]
+    c_agj_adjust = zagj.groupby("CO_FIPS")['agr_sqft'].sum()
+
+    agj_adjusts = {cid: (agj.loc[agj.cid == cid, 'number_of_jobs'].iloc[0] / c_agj_adjust[cid]) 
+                   for cid in [57, 11, 35, 49]}
     tdm_output['FM_AGRI'] = 0
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 57] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 57] * agj_adjust57
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 11] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 11] * agj_adjust11
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 35] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 35] * agj_adjust35
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 49] = tdm_output.agr_sqft[tdm_output.CO_FIPS == 49] * agj_adjust49
-    tdm_output.FM_AGRI = np.round(tdm_output.FM_AGRI)
-    # secondadjustment
-    c_agj_adjust = tdm_output.groupby("CO_FIPS").FM_AGRI.sum()
-    agj_adjust57 = (agj[agj.cid == 57].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[57]
-    agj_adjust11 = (agj[agj.cid == 11].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[11]
-    agj_adjust35 = (agj[agj.cid == 35].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[35]
-    agj_adjust49 = (agj[agj.cid == 49].number_of_jobs.iloc[0]) * 1.0 / c_agj_adjust[49]
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 57] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 57] * agj_adjust57
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 11] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 11] * agj_adjust11
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 35] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 35] * agj_adjust35
-    tdm_output.FM_AGRI[tdm_output.CO_FIPS == 49] = tdm_output.FM_AGRI[tdm_output.CO_FIPS == 49] * agj_adjust49
+    for cid, adjust in agj_adjusts.items():
+        mask = tdm_output['CO_FIPS'] == cid
+        tdm_output.loc[mask, 'FM_AGRI'] = tdm_output.loc[mask, 'agr_sqft'] * adjust
 
-    # Mining Job
+    # Second adjustment
+    c_agj_adjust2 = tdm_output.groupby("CO_FIPS")['FM_AGRI'].sum()
+    agj_adjusts2 = {cid: (agj.loc[agj.cid == cid, 'number_of_jobs'].iloc[0] / c_agj_adjust2[cid]) 
+                    for cid in [57, 11, 35, 49]}
+    for cid, adjust in agj_adjusts2.items():
+        mask = tdm_output['CO_FIPS'] == cid
+        tdm_output.loc[mask, 'FM_AGRI'] *= adjust
+    tdm_output['FM_AGRI'] = np.round(tdm_output['FM_AGRI'])
+
+    # ---------------------------------------------------------------
+    # 6. MINING JOBS ADJUSTMENT
+    # ---------------------------------------------------------------
     mij = employment_control[(employment_control.year == year) & (employment_control.sector_id == 8)]
-    c_mij_adjust = tdm_output.groupby("CO_FIPS").FM_MING.sum()
-    mij_adjust57 = (mij[mij.cid == 57].number_of_jobs.iloc[0]) * 1.0 / c_mij_adjust[57]
-    mij_adjust11 = (mij[mij.cid == 11].number_of_jobs.iloc[0]) * 1.0 / c_mij_adjust[11]
-    mij_adjust35 = (mij[mij.cid == 35].number_of_jobs.iloc[0]) * 1.0 / c_mij_adjust[35]
-    mij_adjust49 = (mij[mij.cid == 49].number_of_jobs.iloc[0]) * 1.0 / c_mij_adjust[49]
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 57] = tdm_output.FM_MING[tdm_output.CO_FIPS == 57] * mij_adjust57
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 11] = tdm_output.FM_MING[tdm_output.CO_FIPS == 11] * mij_adjust11
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 35] = tdm_output.FM_MING[tdm_output.CO_FIPS == 35] * mij_adjust35
-    tdm_output.FM_MING[tdm_output.CO_FIPS == 49] = tdm_output.FM_MING[tdm_output.CO_FIPS == 49] * mij_adjust49
+    c_mij_adjust = tdm_output.groupby("CO_FIPS")['FM_MING'].sum()
+    mij_adjusts = {cid: (mij.loc[mij.cid == cid, 'number_of_jobs'].iloc[0] / c_mij_adjust[cid])
+                   for cid in [57, 11, 35, 49]}
+    for cid, adjust in mij_adjusts.items():
+        mask = tdm_output['CO_FIPS'] == cid
+        tdm_output.loc[mask, 'FM_MING'] *= adjust
 
-    # tdmoutput
-    tdm_output['HHSIZE'] = 0
-    tdm_output.HHSIZE[tdm_output.TOTHH > 0] = tdm_output.HHPOP[tdm_output.TOTHH > 0] / tdm_output.TOTHH[
-        tdm_output.TOTHH > 0]
+    # ---------------------------------------------------------------
+    # 7. FINAL HOUSEHOLD SIZE CALCULATION
+    # ---------------------------------------------------------------
+    mask_hh = tdm_output['TOTHH'] > 0
+    tdm_output.loc[mask_hh, 'HHSIZE'] = tdm_output.loc[mask_hh, 'HHPOP'] / tdm_output.loc[mask_hh, 'TOTHH']
 
-    inputdir = settings['tdm']['input_dir'] + '/'  # come back to this when gui is farther along
-    if not os.path.exists(inputdir):
-        os.makedirs(inputdir)  
-    
-    filename = "SE_" + str(year) + ".csv"
-    filepath = os.path.join(inputdir, filename)
+    # ---------------------------------------------------------------
+    # 8. EXPORT TDM OUTPUT AND UNIT FILE
+    # ---------------------------------------------------------------
+    inputdir = settings['tdm']['input_dir'] + '/'
+    os.makedirs(inputdir, exist_ok=True)
 
-    tdm_output.to_csv(filepath)
+    filename = f"SE_{year}.csv"
+    tdm_output.to_csv(os.path.join(inputdir, filename))
 
     buildings = buildings.to_frame(['residential_units', 'job_spaces', 'zone_id'])
-    unitfilename = "UNITS_JOBSPACES_" + str(year) + ".csv"
-    unitfilepath = os.path.join(inputdir, unitfilename)
-    unit_output = tdm_output[['TOTHH', 'HHPOP']]
-    unit_output['REMMEMP'] = jobs.groupby("zone_id").building_id.count()
-    unit_output['residential_units'] = buildings.groupby("zone_id").residential_units.sum()
-    unit_output['job_spaces'] = buildings.groupby("zone_id").job_spaces.sum()
+    unit_output = tdm_output[['TOTHH', 'HHPOP']].copy()
+    unit_output['REMMEMP'] = jobs.groupby("zone_id")['building_id'].count()
+    unit_output['residential_units'] = buildings.groupby("zone_id")['residential_units'].sum()
+    unit_output['job_spaces'] = buildings.groupby("zone_id")['job_spaces'].sum()
     unit_output = unit_output.fillna(0)
-    unit_output.to_csv(unitfilepath)
+
+    unitfilename = f"UNITS_JOBSPACES_{year}.csv"
+    unit_output.to_csv(os.path.join(inputdir, unitfilename))
+
 
 
 @sim.step('travel_model_export_add_construction_TAZ900')
 def travel_model_export_add_construction_TAZ900(year, settings, jobs, households, buildings, parcels):
+    # ---------------------------------------------------------------
+    # 1. PREPARE BUILDINGS AND PARCELS
+    # ---------------------------------------------------------------
     buildings = buildings.to_frame()
-    parcels = parcels.to_frame()
-    parcels=parcels.reset_index()
+    parcels = parcels.to_frame().reset_index()
     parcels['parcel_id_REMM'] = parcels['parcel_id']
+
     parcelsTAZ900 = parcels[['parcel_id_REMM', 'TAZID_900']]
-    buildings = pd.merge(buildings, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
+    buildings = pd.merge(buildings, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM', how='left')
 
-
+    # ---------------------------------------------------------------
+    # 2. LOAD TDM OUTPUT
+    # ---------------------------------------------------------------
     inputdir = settings['tdm']['input_dir'] + '/'
-    filename = "SE_" + str(year) + ".csv"
+    filename = f"SE_{year}.csv"
     filepath = os.path.join(inputdir, filename)
-
-    tdm_output = pd.read_csv(filepath, index_col=";TAZID")
+    tdm_output = pd.read_csv(filepath, index_col=';TAZID')
 
     employment_control = pd.read_csv("data/employment_controls.csv")
 
-    # Construction Job
+    # ---------------------------------------------------------------
+    # 3. CONSTRUCTION JOBS: SUM NEW BUILDING SQFT BY TAZ
+    # ---------------------------------------------------------------
     coj = employment_control[(employment_control.year == year) & (employment_control.sector_id == 2)]
+
     if year == settings['remm']['base_year']:
         cbuilding = buildings[(buildings.year_built == year) & (buildings.note == 'base')]
     else:
         cbuilding = buildings[buildings.year_built == year]
-    tdm_output['new_building_sqft'] = cbuilding.groupby("TAZID_900").building_sqft.sum()
+
+    tdm_output['new_building_sqft'] = cbuilding.groupby("TAZID_900")['building_sqft'].sum()
     tdm_output = tdm_output.fillna(0)
 
-    coj_adjust57 = 1 / 2200
-    coj_adjust11 = 1 / 2200
-    coj_adjust35 = 1 / 2200
-    coj_adjust49 = 1 / 2200
+    # ---------------------------------------------------------------
+    # 4. INITIAL FM_CONS CALCULATION (per-county)
+    # ---------------------------------------------------------------
+    coj_adjusts = {57: 1/2200, 11: 1/2200, 35: 1/2200, 49: 1/2200}
     tdm_output['FM_CONS'] = 0
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 57] * coj_adjust57
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 11] * coj_adjust11
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 35] * coj_adjust35
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 49] * coj_adjust49
-    tdm_output.FM_CONS = np.round(tdm_output.FM_CONS)
 
-    # secondadjustment
-    c_coj_adjust = tdm_output.groupby("CO_FIPS").FM_CONS.sum()
-    tdm_output['HHJobs'] = tdm_output['TOTHH'] + tdm_output['RETL'] + tdm_output['FOOD'] + tdm_output['MANU'] + tdm_output['WSLE'] + tdm_output['OFFI'] + tdm_output['GVED']+ tdm_output['HLTH'] + tdm_output['OTHR']
-    c_coj_adjustSE = tdm_output.groupby("CO_FIPS").HHJobs.sum()
-    coj_adjust57 = ((coj[coj.cid == 57].number_of_jobs.iloc[0]) - c_coj_adjust[57]) / c_coj_adjustSE[57]
-    coj_adjust11 = ((coj[coj.cid == 11].number_of_jobs.iloc[0]) - c_coj_adjust[11]) / c_coj_adjustSE[11]
-    coj_adjust35 = ((coj[coj.cid == 35].number_of_jobs.iloc[0]) - c_coj_adjust[35]) / c_coj_adjustSE[35]
-    coj_adjust49 = ((coj[coj.cid == 49].number_of_jobs.iloc[0]) - c_coj_adjust[49]) / c_coj_adjustSE[49]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.HHJobs[tdm_output.CO_FIPS == 57] * coj_adjust57 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 57]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.HHJobs[tdm_output.CO_FIPS == 11] * coj_adjust11 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 11]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.HHJobs[tdm_output.CO_FIPS == 35] * coj_adjust35 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 35]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.HHJobs[tdm_output.CO_FIPS == 49] * coj_adjust49 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 49]
+    for fips, adjust in coj_adjusts.items():
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'FM_CONS'] = tdm_output.loc[mask, 'new_building_sqft'] * adjust
+
+    tdm_output['FM_CONS'] = np.round(tdm_output['FM_CONS'])
+
+    # ---------------------------------------------------------------
+    # 5. SECOND ADJUSTMENT BASED ON HHJobs
+    # ---------------------------------------------------------------
+    tdm_output['HHJobs'] = (
+        tdm_output['TOTHH'] + tdm_output['RETL'] + tdm_output['FOOD'] +
+        tdm_output['MANU'] + tdm_output['WSLE'] + tdm_output['OFFI'] +
+        tdm_output['GVED'] + tdm_output['HLTH'] + tdm_output['OTHR']
+    )
+
+    c_coj_adjust = tdm_output.groupby("CO_FIPS")['FM_CONS'].sum()
+    c_coj_adjustSE = tdm_output.groupby("CO_FIPS")['HHJobs'].sum()
+
+    # Compute final per-county adjustment factors
+    final_adjusts = {}
+    for fips in coj_adjusts.keys():
+        target_jobs = coj.loc[coj.cid == fips, 'number_of_jobs'].iloc[0]
+        final_adjusts[fips] = (target_jobs - c_coj_adjust[fips]) / c_coj_adjustSE[fips]
+
+    # Apply final adjustment
+    for fips, adjust in final_adjusts.items():
+        mask = tdm_output['CO_FIPS'] == fips
+        tdm_output.loc[mask, 'FM_CONS'] += tdm_output.loc[mask, 'HHJobs'] * adjust
+
 
     # zcoj = tdm_output[(tdm_output.new_building_sqft > 0)]
     # c_coj_adjust = zcoj.groupby("CO_FIPS").new_building_sqft.sum()
@@ -2232,92 +2293,149 @@ def travel_model_export_add_construction_TAZ900(year, settings, jobs, households
     # tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] * coj_adjust35
     # tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] * coj_adjust49
 
-    tdm_output['ALLEMP'] = tdm_output['RETL'] + tdm_output['FOOD'] + tdm_output['MANU'] + tdm_output['WSLE'] + \
-                           tdm_output['OFFI'] + tdm_output['GVED'] + tdm_output['HLTH'] + tdm_output['OTHR'] + \
-                           tdm_output['FM_AGRI'] + tdm_output['FM_MING'] + tdm_output['FM_CONS'] + tdm_output['HBJ']
+    # ---------------------------------------------------------------
+    # 1. COMPUTE EMPLOYMENT GROUPS FOR BASE TDM OUTPUT
+    # ---------------------------------------------------------------
 
-    tdm_output['RETEMP'] = tdm_output['RETL'] + tdm_output['FOOD']
-    tdm_output['INDEMP'] = tdm_output['MANU'] + tdm_output['WSLE']
-    tdm_output['OTHEMP'] = tdm_output['OFFI'] + tdm_output['GVED'] + tdm_output['HLTH'] + tdm_output['OTHR']
-    tdm_output['TOTEMP'] = tdm_output['RETEMP'] + tdm_output['INDEMP'] + tdm_output['OTHEMP']
+    # Components used in multiple computations
+    retail_cols = ['RETL', 'FOOD']
+    industrial_cols = ['MANU', 'WSLE']
+    other_emp_cols = ['OFFI', 'GVED', 'HLTH', 'OTHR']
+    farm_cols = ['FM_AGRI', 'FM_MING', 'FM_CONS', 'HBJ']
 
+    # Employment sub-totals
+    tdm_output['RETEMP'] = tdm_output[retail_cols].sum(axis=1)
+    tdm_output['INDEMP'] = tdm_output[industrial_cols].sum(axis=1)
+    tdm_output['OTHEMP'] = tdm_output[other_emp_cols].sum(axis=1)
+
+    # Total employment
+    tdm_output['TOTEMP'] = (
+        tdm_output['RETEMP'] +
+        tdm_output['INDEMP'] +
+        tdm_output['OTHEMP']
+    )
+
+    # All employment including farm categories
+    tdm_output['ALLEMP'] = (
+        tdm_output['TOTEMP'] + tdm_output[farm_cols].sum(axis=1)
+    )
+
+    # Keep in standard output order
     tdm_output = tdm_output[
-        ["CO_TAZID", "TOTHH", "HHPOP", "HHSIZE", "TOTEMP", "RETEMP", "INDEMP", "OTHEMP", "ALLEMP", "RETL", "FOOD",
-         "MANU", "WSLE", "OFFI", "GVED", "HLTH", "OTHR", "FM_AGRI", "FM_MING", "FM_CONS", "HBJ", "AVGINCOME",
-         "Enrol_Elem", "Enrol_Midl", "Enrol_High", "CO_FIPS", "CO_NAME"]]
+        ["CO_TAZID", "TOTHH", "HHPOP", "HHSIZE", "TOTEMP", "RETEMP", "INDEMP",
+        "OTHEMP", "ALLEMP", "RETL", "FOOD", "MANU", "WSLE", "OFFI", "GVED",
+        "HLTH", "OTHR", "FM_AGRI", "FM_MING", "FM_CONS", "HBJ",
+        "AVGINCOME", "Enrol_Elem", "Enrol_Midl", "Enrol_High",
+        "CO_FIPS", "CO_NAME"]
+    ]
 
-    nonremm = pd.read_csv("data/WF NonREMM TAZ Forecast - 2023-04-11.csv")
-    nonremm_cur = nonremm[nonremm['YEAR'] == year]
+
+    # ---------------------------------------------------------------
+    # 2. LOAD NONREMM FORECAST AND COMPUTE ITS EMPLOYMENT GROUPS
+    # ---------------------------------------------------------------
+
+    nonremm = pd.read_csv("data/WF NonREMM TAZ Forecast - 2025-07-03.csv")
+    nonremm_cur = nonremm.loc[nonremm['YEAR'] == year].copy()
+
+    # Select columns of interest
     nonremm_cur = nonremm_cur[
-        ['TAZID', 'CO_TAZID', 'HH', 'HH_Pop', 'HH_Size', 'ALLEMP', 'RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED',
-         'HLTH', 'OTHR', 'AGRI', 'MING', 'CONS', 'HBJ', 'CO_FIPS', 'CO_NAME']]
-    nonremm_cur['RETEMP'] = nonremm_cur['RETL'] + nonremm_cur['FOOD']
-    nonremm_cur['INDEMP'] = nonremm_cur['MANU'] + nonremm_cur['WSLE']
-    nonremm_cur['OTHEMP'] = nonremm_cur['OFFI'] + nonremm_cur['GVED'] + nonremm_cur['HLTH'] + nonremm_cur['OTHR']
-    nonremm_cur['TOTEMP'] = nonremm_cur['RETEMP'] + nonremm_cur['INDEMP'] + nonremm_cur['OTHEMP']
-    nonremm_cur = nonremm_cur[
-        ['TAZID', 'HH', 'HH_Pop', 'HH_Size', 'TOTEMP', 'RETEMP', 'INDEMP', 'OTHEMP','ALLEMP','RETL', 'FOOD', 'MANU',
-         'WSLE', 'OFFI', 'GVED', 'HLTH', 'OTHR', 'AGRI', 'MING', 'CONS',
-         'HBJ']]  #
-    nonremm_cur.columns = [';TAZID', 'TOTHH2', 'HHPOP2', 'HHSIZE2','TOTEMP2', 'RETEMP2', 'INDEMP2', 'OTHEMP2', 'ALLEMP2', 'RETL2','FOOD2', 'MANU2', 'WSLE2', 'OFFI2',
-                           'GVED2', 'HLTH2', 'OTHR2',
-                           'FM_AGRI2', 'FM_MING2', 'FM_CONS2',
-                           'HBJ2']  #
-    tdm_output = pd.merge(tdm_output, nonremm_cur, how='left', on=[";TAZID", ";TAZID"])
-    tdm_output['TOTHH'][tdm_output['TOTHH2'] > 0] = tdm_output['TOTHH2']
-    tdm_output['HHPOP'][tdm_output['HHPOP2'] > 0] = tdm_output['HHPOP2']
-    tdm_output['HHSIZE'][tdm_output['HHSIZE2'] > 0] = tdm_output['HHSIZE2']
-    tdm_output['TOTEMP'][tdm_output['TOTEMP2'] > 0] = tdm_output['TOTEMP2']
-    tdm_output['RETEMP'][tdm_output['RETEMP2'] > 0] = tdm_output['RETEMP2']
-    tdm_output['INDEMP'][tdm_output['INDEMP2'] > 0] = tdm_output['INDEMP2']
-    tdm_output['OTHEMP'][tdm_output['OTHEMP2'] > 0] = tdm_output['OTHEMP2']
-    tdm_output['ALLEMP'][tdm_output['ALLEMP2'] > 0] = tdm_output['ALLEMP2']
-    tdm_output['RETL'][tdm_output['RETL2'] > 0] = tdm_output['RETL2']
-    tdm_output['FOOD'][tdm_output['FOOD2'] > 0] = tdm_output['FOOD2']
-    tdm_output['MANU'][tdm_output['MANU2'] > 0] = tdm_output['MANU2']
-    tdm_output['WSLE'][tdm_output['WSLE2'] > 0] = tdm_output['WSLE2']
-    tdm_output['OFFI'][tdm_output['OFFI2'] > 0] = tdm_output['OFFI2']
-    tdm_output['GVED'][tdm_output['GVED2'] > 0] = tdm_output['GVED2']
-    tdm_output['HLTH'][tdm_output['HLTH2'] > 0] = tdm_output['HLTH2']
-    tdm_output['OTHR'][tdm_output['OTHR2'] > 0] = tdm_output['OTHR2']
-    tdm_output['FM_AGRI'][tdm_output['FM_AGRI2'] > 0] = tdm_output['FM_AGRI2']
-    tdm_output['FM_MING'][tdm_output['FM_MING2'] > 0] = tdm_output['FM_MING2']
-    tdm_output['FM_CONS'][tdm_output['FM_CONS2'] > 0] = tdm_output['FM_CONS2']
-    tdm_output['HBJ'][tdm_output['HBJ2'] > 0] = tdm_output['HBJ2']
-    tdm_output = tdm_output[
-        [';TAZID', 'CO_TAZID', 'TOTHH', 'HHPOP', 'HHSIZE','TOTEMP','RETEMP','INDEMP','OTHEMP','ALLEMP', 'RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED', 'HLTH',
-         'OTHR', 'FM_AGRI', 'FM_MING', 'FM_CONS', 'HBJ', 'AVGINCOME', 'Enrol_Elem', 'Enrol_Midl', 'Enrol_High',
-         'CO_FIPS', 'CO_NAME']]  #
-    tdm_output = tdm_output.sort_values(by=[';TAZID'])
+        ['TAZID', 'CO_TAZID', 'HH', 'HH_Pop', 'HH_Size', 'ALLEMP',
+        'RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED', 'HLTH', 'OTHR',
+        'AGRI', 'MING', 'CONS', 'HBJ', 'CO_FIPS', 'CO_NAME']
+    ]
 
-    BoxElder = pd.read_csv("data/box_elderTAZ900/SE_BOX ELDER_"+str(year)+".csv")
-    BoxElder = BoxElder[[';CO_TAZID', 'TOTHH', 'HHPOP', 'HHSIZE', 'TOTEMP', 'RETEMP', 'INDEMP','OTHEMP','ALLEMP','RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED','HLTH', 'OTHR', 'FM_AGRI', 'FM_MING', 'FM_CONS', 'HBJ']]  #
-    BoxElder.columns = ['CO_TAZID', 'TOTHH2', 'HHPOP2', 'HHSIZE2','TOTEMP2', 'RETEMP2', 'INDEMP2', 'OTHEMP2', 'ALLEMP2', 'RETL2','FOOD2', 'MANU2', 'WSLE2', 'OFFI2', 'GVED2', 'HLTH2', 'OTHR2', 'FM_AGRI2', 'FM_MING2', 'FM_CONS2', 'HBJ2']
-    tdm_output = pd.merge(tdm_output, BoxElder, how='left', on=["CO_TAZID", "CO_TAZID"])
-    tdm_output['TOTHH'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['TOTHH2']
-    tdm_output['HHPOP'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['HHPOP2']
-    tdm_output['HHSIZE'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['HHSIZE2']
-    tdm_output['TOTEMP'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['TOTEMP2']
-    tdm_output['RETEMP'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['RETEMP2']
-    tdm_output['INDEMP'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['INDEMP2']
-    tdm_output['OTHEMP'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['OTHEMP2']
-    tdm_output['ALLEMP'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['ALLEMP2']
-    tdm_output['RETL'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['RETL2']
-    tdm_output['FOOD'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['FOOD2']
-    tdm_output['MANU'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['MANU2']
-    tdm_output['WSLE'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['WSLE2']
-    tdm_output['OFFI'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['OFFI2']
-    tdm_output['GVED'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['GVED2']
-    tdm_output['HLTH'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['HLTH2']
-    tdm_output['OTHR'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['OTHR2']
-    tdm_output['FM_AGRI'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['FM_AGRI2']
-    tdm_output['FM_MING'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['FM_MING2']
-    tdm_output['FM_CONS'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['FM_CONS2']
-    tdm_output['HBJ'][tdm_output['CO_TAZID'] <= 30153] = tdm_output['HBJ2']
+    # Compute employment groups using the same definitions
+    nonremm_cur['RETEMP'] = nonremm_cur[retail_cols].sum(axis=1)
+    nonremm_cur['INDEMP'] = nonremm_cur[industrial_cols].sum(axis=1)
+    nonremm_cur['OTHEMP'] = nonremm_cur[other_emp_cols].sum(axis=1)
+    nonremm_cur['TOTEMP'] = (
+        nonremm_cur['RETEMP'] +
+        nonremm_cur['INDEMP'] +
+        nonremm_cur['OTHEMP']
+    )
+
+    # Reorder and rename with “2” suffix to indicate alternate forecast source
+    nonremm_cur = nonremm_cur[
+        ['TAZID', 'HH', 'HH_Pop', 'HH_Size', 'TOTEMP', 'RETEMP', 'INDEMP',
+        'OTHEMP', 'ALLEMP', 'RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED',
+        'HLTH', 'OTHR', 'AGRI', 'MING', 'CONS', 'HBJ']
+    ]
+
+    nonremm_cur.columns = [
+        ';TAZID', 'TOTHH2', 'HHPOP2', 'HHSIZE2', 'TOTEMP2', 'RETEMP2',
+        'INDEMP2', 'OTHEMP2', 'ALLEMP2', 'RETL2', 'FOOD2', 'MANU2',
+        'WSLE2', 'OFFI2', 'GVED2', 'HLTH2', 'OTHR2', 'FM_AGRI2', 'FM_MING2',
+        'FM_CONS2', 'HBJ2'
+    ]
+
+
+    # ---------------------------------------------------------------
+    # 3. MERGE NONREMM AND APPLY OVERRIDES ONLY WHERE (>0)
+    # ---------------------------------------------------------------
+
+    tdm_output = pd.merge(tdm_output, nonremm_cur, how='left', on=';TAZID')
+
+    # Columns whose values may be overridden
+    override_cols = [
+        'TOTHH', 'HHPOP', 'HHSIZE', 'TOTEMP', 'RETEMP', 'INDEMP', 'OTHEMP',
+        'ALLEMP', 'RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED', 'HLTH',
+        'OTHR', 'FM_AGRI', 'FM_MING', 'FM_CONS', 'HBJ'
+    ]
+
+    # Apply overrides wherever the forecast (col2) is > 0
+    for col in override_cols:
+        mask = tdm_output[f"{col}2"] > 0
+        tdm_output.loc[mask, col] = tdm_output.loc[mask, f"{col}2"]
+
+    # Final ordering
     tdm_output = tdm_output[
-        [';TAZID', 'CO_TAZID', 'TOTHH', 'HHPOP', 'HHSIZE','TOTEMP','RETEMP','INDEMP','OTHEMP','ALLEMP', 'RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED', 'HLTH',
-         'OTHR', 'FM_AGRI', 'FM_MING', 'FM_CONS', 'HBJ', 'AVGINCOME', 'Enrol_Elem', 'Enrol_Midl', 'Enrol_High',
-         'CO_FIPS', 'CO_NAME']]
+        [';TAZID', 'CO_TAZID', 'TOTHH', 'HHPOP', 'HHSIZE', 'TOTEMP',
+        'RETEMP', 'INDEMP', 'OTHEMP', 'ALLEMP', 'RETL', 'FOOD', 'MANU',
+        'WSLE', 'OFFI', 'GVED', 'HLTH', 'OTHR', 'FM_AGRI', 'FM_MING',
+        'FM_CONS', 'HBJ', 'AVGINCOME', 'Enrol_Elem', 'Enrol_Midl',
+        'Enrol_High', 'CO_FIPS', 'CO_NAME']
+    ]
+
+    # Sort for consistent output
+    tdm_output = tdm_output.sort_values(by=';TAZID')
+
+    # Read Box Elder file
+    BoxElder = pd.read_csv(f"data/box_elderTAZ900/SE_BOX ELDER_{year}.csv")
+
+    # Select and rename columns
+    BoxElder = BoxElder[[';CO_TAZID', 'TOTHH', 'HHPOP', 'HHSIZE', 'TOTEMP', 'RETEMP',
+                        'INDEMP', 'OTHEMP', 'ALLEMP', 'RETL', 'FOOD', 'MANU', 'WSLE',
+                        'OFFI', 'GVED', 'HLTH', 'OTHR', 'FM_AGRI', 'FM_MING',
+                        'FM_CONS', 'HBJ']]
+
+    BoxElder.columns = ['CO_TAZID', 'TOTHH2', 'HHPOP2', 'HHSIZE2', 'TOTEMP2', 'RETEMP2',
+                        'INDEMP2', 'OTHEMP2', 'ALLEMP2', 'RETL2', 'FOOD2', 'MANU2',
+                        'WSLE2', 'OFFI2', 'GVED2', 'HLTH2', 'OTHR2', 'FM_AGRI2',
+                        'FM_MING2', 'FM_CONS2', 'HBJ2']
+
+    # Correct merge (duplicate 'on' columns removed)
+    tdm_output = pd.merge(tdm_output, BoxElder, how='left', on="CO_TAZID")
+
+    # Update where CO_TAZID <= 30153
+    mask = tdm_output['CO_TAZID'] <= 30153
+
+    cols = [
+        'TOTHH','HHPOP','HHSIZE','TOTEMP','RETEMP','INDEMP','OTHEMP','ALLEMP',
+        'RETL','FOOD','MANU','WSLE','OFFI','GVED','HLTH','OTHR',
+        'FM_AGRI','FM_MING','FM_CONS','HBJ'
+    ]
+
+    # loop through all columns and replace box elder values
+    for col in cols:
+        tdm_output.loc[mask, col] = tdm_output.loc[mask, f"{col}2"]
+
+    # Final reorder
+    tdm_output = tdm_output[
+        [';TAZID', 'CO_TAZID', 'TOTHH', 'HHPOP', 'HHSIZE', 'TOTEMP', 'RETEMP', 'INDEMP',
+        'OTHEMP','ALLEMP','RETL','FOOD','MANU','WSLE','OFFI','GVED','HLTH','OTHR',
+        'FM_AGRI','FM_MING','FM_CONS','HBJ','AVGINCOME','Enrol_Elem','Enrol_Midl',
+        'Enrol_High','CO_FIPS','CO_NAME']
+    ]
 
     inputdir = settings['tdm']['input_dir'] + '/'
     filename = "SE_" + str(year) + ".csv"
