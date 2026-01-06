@@ -51,10 +51,10 @@ sim.run([
         "clear_cache",
         "indicator_export",
         # 'progression_metrics_export',
-        "travel_model_export_no_construction",  # export travel model inputs at TAZ level in specified years
+        # "travel_model_export_no_construction",  # export travel model inputs at TAZ level in specified years
         "travel_model_export_no_construction_TAZ900",  # export travel model inputs at TAZ level in specified years
         "garbage_collect",
-        "travel_model_export_add_construction",  # export travel model inputs at TAZ level in specified years
+        # "travel_model_export_add_construction",  # export travel model inputs at TAZ level in specified years
         "travel_model_export_add_construction_TAZ900",  # export travel model inputs at TAZ level in specified years
         # "run_cube",               # call Cube and import travel times in specified years
         # "parcelDistanceToTransitStop"
