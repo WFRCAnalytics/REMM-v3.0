@@ -4,8 +4,8 @@ aggregation_tables:
 
 remm:
     base_year: 2023
-    end_year: 2024
-    indicator_years: [2023] 
+    end_year: 2056
+    indicator_years: [2023,2025,2030,2035,2040,2045,2050,2055] 
     
 tdm:
   run_years:
@@ -149,7 +149,10 @@ pusher:
 
 
 store: remm_data_base_year_2023_20251216.h5
-
+policy_override: zoning_parcels_p_20260106.csv
+pipeline_buildings: pipeline_buildings.csv 
+tdm_template_v900: tdm_template_TAZ900.csv
+pipeline_jobs: pipeline_jobs.csv
 
 scenario: baseline
 

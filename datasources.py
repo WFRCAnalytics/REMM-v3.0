@@ -384,15 +384,8 @@ def zoning_baseline(store, settings, year):
 #                  right_index=True)
     df = store['zoning_baseline']
 
-    #if os.path.exists(os.path.join(misc.data_dir(), "zoning_parcels.csv")):
-    #    df['parcel_id'] = df.index
-    #    alter = pd.read_csv(os.path.join(misc.data_dir(), "zoning_parcels.csv"), index_col='parcel_id')
-    #    df = pd.merge(df, alter, how='left', left_index=True, right_index=True, suffixes=('','_x'))
-    #    df.max_dua[df.max_dua_x.notnull()] = df.max_dua_x[df.max_dua_x.notnull()]
-    #    df.max_far[df.max_far_x.notnull()] = df.max_far_x[df.max_far_x.notnull()]
-    #    df = df.drop(['max_dua_x','max_far_x'], axis=1)
-    if os.path.exists(os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p.csv")):
-        update = pd.read_csv(os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p.csv"))
+    if os.path.exists(os.path.join(misc.data_dir(),  sim.get_injectable('settings')["policy_override"])):
+        update = pd.read_csv(os.path.join(misc.data_dir(),  sim.get_injectable('settings')["policy_override"]))
         update = update[update.year<=year]
         update = update.sort_values(by='year', ascending=1)
         update = update.drop_duplicates(subset="parcel_id",keep="last")

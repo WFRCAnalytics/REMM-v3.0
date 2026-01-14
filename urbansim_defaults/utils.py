@@ -556,21 +556,28 @@ def full_transition(agents, agent_controls, year, settings, location_fname):
                          settings['add_columns'])
     hh.rename(columns={'county_id': 'cid'}, inplace=True)
     hh = hh.loc[:, ~hh.columns.duplicated()].copy()
-
+    pipeline_jobs_path =  os.path.join(misc.data_dir(),  sim.get_injectable('settings')["pipeline_jobs"])
     if agents.name == 'jobs':
-        pipelineJobs = pd.read_csv(os.path.join(misc.data_dir(), "pipelineJobs.csv"))
-        pcls = sim.get_table('parcels').to_frame(['county_id'])
-        pipelineJobs = pipelineJobs.merge(pcls, how='left', left_on='building_id', right_on='parcel_id')
-        for ind in pipelineJobs.index:
-            building_id = pipelineJobs['building_id'][ind]
-            cid = pipelineJobs['county_id'][ind]
-            sector_id = pipelineJobs['sector_id'][ind]
-            yearT = pipelineJobs['year'][ind]
-            jobs = pipelineJobs['jobs'][ind]
-            if yearT == year:
-                for x in range(0, jobs):
-                    new_row = pd.DataFrame([{'building_id': building_id, 'cid': cid,'sector_id': sector_id}])
-                    hh = pd.concat([hh, new_row], ignore_index=True)
+        if os.path.exists(pipeline_jobs_path):
+            pipeline_jobs = pd.read_csv(pipeline_jobs_path)
+        
+        
+            print('-Adding pipeline jobs')
+            pcls = sim.get_table('parcels').to_frame(['county_id'])
+
+            pipeline_jobs = pipeline_jobs.merge(pcls, how='left', left_on='building_id', right_on='parcel_id')
+            for ind in pipeline_jobs.index:
+                building_id = pipeline_jobs['building_id'][ind]
+                cid = pipeline_jobs['county_id'][ind]
+                sector_id = pipeline_jobs['sector_id'][ind]
+                yearT = pipeline_jobs['year'][ind]
+                jobs = pipeline_jobs['jobs'][ind]
+                if yearT == year:
+                    for x in range(0, jobs):
+                        new_row = pd.DataFrame([{'building_id': building_id, 'cid': cid,'sector_id': sector_id}])
+                        hh = pd.concat([hh, new_row], ignore_index=True)
+        else:
+            print('-Pipeline jobs not found, skipping routine')
 
     print ("Total agents before transition: {}".format(len(hh)))
     tran = transition.TabularTotalsTransition(ct, settings['total_column'])

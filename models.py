@@ -520,7 +520,7 @@ def trend_calibration(year):
 
 
 @sim.step('pipeline_projects')
-def pipeline_projects(year):
+def pipeline_projects(year, settings):
     # get buildings table
     bt = sim.get_table("buildings")
     b = bt.to_frame(bt.local_columns)
@@ -534,7 +534,8 @@ def pipeline_projects(year):
     jobs = jobst.to_frame(jobst.local_columns)
 
     # read in pipeline buildings
-    pipeline = pd.read_csv("data\pipeline_buildings.csv")
+    pipeline = pd.read_csv(os.path.join(misc.data_dir(),settings['pipeline_buildings']))
+
     pipeline = pipeline[(pipeline.year_built == year)]
 
     # identify buildings that need to be demolished
@@ -2104,7 +2105,7 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
     parcelsTAZ900 = parcels[['parcel_id_REMM','TAZID_900']]
     households = pd.merge(households, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
     jobs = pd.merge(jobs, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
-    tdm_output = pd.read_csv("data/tdm_template_TAZ900.csv", index_col=";TAZID")
+    tdm_output = pd.read_csv(os.path.join(misc.data_dir(),settings['tdm_template_v900']), index_col=";TAZID")
     tdm_output['TOTHH'] = households.groupby("TAZID_900").building_id.count()
     tdm_output['HHPOP'] = households.groupby("TAZID_900").persons.sum()
     tdm_output['RETL'] = jobs[jobs.sector_id == 9].groupby("TAZID_900").building_id.count()
