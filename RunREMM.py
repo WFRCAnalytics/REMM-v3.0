@@ -13,7 +13,7 @@ sim.run([
         # "preprocess_countycontrol", # prepare county control file
         "utility_restriction",    # run utility restriction for UT County
         "travel_time_import",
-        # "pipeline_projects",      # violently assert new buildings in to the buildings table
+        "pipeline_projects",      # violently assert new buildings in to the buildings table
         "neighborhood_vars",      # neighborhood variables
         "households_transition",  # households transition
         "jobs_transition",        # jobs transition
