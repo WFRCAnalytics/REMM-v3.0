@@ -1,12 +1,14 @@
-aggregation_tables:
-  - nodes
-  - zones
+store: remm_data_base_year_2023_20260205.h5
+policy_override: zoning_parcels_p_20260205.csv
+pipeline_buildings: pipeline_buildings_20260209.csv
+tdm_template_v900: tdm_template_TAZ900.csv
+pipeline_jobs: pipeline_jobs_20260209.csv
 
 remm:
-    base_year: 2023
-    end_year: 2056
-    indicator_years: [2023,2025,2030,2035,2040,2045,2050,2055] 
-    
+  base_year: 2023
+  end_year: 2056
+  indicator_years: [2023, 2025, 2030, 2035, 2040, 2045, 2050, 2055]
+
 tdm:
   run_years:
     - 2023
@@ -26,34 +28,32 @@ tdm:
   output_fwy: 6_REMM/FreewayExits.DBF
   python2_dir: C:\Python27\ArcGIS10.6
 
-set_nan_price_to_zero: True
 
+aggregation_tables:
+  - nodes
+  - zones
+
+set_nan_price_to_zero: True
 
 remove_invalid_building_ids: True
 
-
 reconcile_residential_units_and_households: True
-
 
 reconcile_non_residential_sqft_and_jobs: True
 
-
 parcel_size_factor: 1
-
 
 ave_sqft_per_unit_clip:
   lower: 400
   sf_upper: 5000
   mf_upper: 2500
 
-
 table_reprocess:
   parcels:
     fill_nas:
       zone_id:
-        how: "mode"
-        type: "int"
-
+        how: 'mode'
+        type: 'int'
 
 rates:
   households_relocation: .00
@@ -61,24 +61,20 @@ rates:
   simple_households_transition: .00
   simple_jobs_transition: .00
 
-
 build_networks:
   name: osm_wfrc.h5
   max_distance: 1500
-
 
 households_transition:
   add_columns:
     - income_quartile
   total_column: number_of_households
 
-
 jobs_transition:
   add_columns:
     - sector_id
     - county_id
   total_column: number_of_jobs
-
 
 feasibility:
   residential_to_yearly: False
@@ -113,17 +109,14 @@ nonres_price_multiplier_utah: 10
 nonres_price_multiplier_davis: 10
 nonres_price_multiplier_weber: 10
 
-
 residential_developer:
   target_vacancy: .07
   min_unit_size: 800
   bldg_sqft_per_job: 400
 
-
 non_residential_developer:
   target_vacancy: .1
   bldg_sqft_per_job: 600
-
 
 industrial_developer:
   target_vacancy: .1
@@ -132,11 +125,10 @@ industrial_developer:
 retail_developer:
   target_vacancy: .1
   bldg_sqft_per_job: 650
-  
+
 office_developer:
   target_vacancy: .1
   bldg_sqft_per_job: 462
-
 
 pusher:
   key: 7d78b1b3454b78aed26f
@@ -145,21 +137,14 @@ pusher:
   region: salt lake
 
 
-store: remm_data_base_year_2023_20260126.h5
-policy_override: zoning_parcels_p_20260106.csv
-pipeline_buildings: pipeline_buildings_20260126.csv 
-tdm_template_v900: tdm_template_TAZ900.csv
-pipeline_jobs: pipeline_jobs_20260125.csv
 
 scenario: baseline
-
 
 scenario_inputs:
   baseline:
     zoning_table_name: zoning_baseline
   test:
     zoning_table_name: zoning_test
-
 
 # this maps Synthicity's 25 employment categories to
 # the six major employment categories traditionally
@@ -191,7 +176,6 @@ naics_to_empsix:
   92: OTHEMPN
   99: OTHEMPN
 
-
 empsix_name_to_id:
   AGREMPN: 1
   MWTEMPN: 2
@@ -199,7 +183,6 @@ empsix_name_to_id:
   FPSEMPN: 4
   HEREMPN: 5
   OTHEMPN: 6
-
 
 # this maps building type ids to general building types
 # basically just reduces dimensionality
@@ -212,7 +195,6 @@ building_type_map:
   6: Govt
   7: Mixed Use
   8: Other
-
 
 # this maps building "forms" from the developer model
 # to building types so that when the developer builds a
@@ -235,7 +217,6 @@ form_to_btype:
   mixedoffice:
     - 7
 
-
 building_sqft_per_job:
   1: 200
   2: 200
@@ -245,7 +226,7 @@ building_sqft_per_job:
   6: 350
   7: 537
   8: 300
-  
+
 sector_id_to_desc:
   1: FOOD
   2: FM_CONS
@@ -256,4 +237,4 @@ sector_id_to_desc:
   7: OTHR
   8: FM_MING
   9: RETL
-  10: WSLE 
+  10: WSLE

@@ -112,7 +112,7 @@ def build_networks(settings):
                        edges[["weight"]],twoway=True)
 
     net.precompute(settings['build_networks']['max_distance'])
-
+    st.close() 
     return net
 
 

@@ -58,4 +58,4 @@ sim.run([
         "travel_model_export_add_construction_TAZ900",  # export travel model inputs at TAZ level in specified years
         # "run_cube",               # call Cube and import travel times in specified years
         # "parcelDistanceToTransitStop"
-    ], iter_vars=range(remm_years['base_year'], remm_years['end_year'])) # change this in settings.yaml
+    ], iter_vars=range(remm_years['base_year'], remm_years['end_year']))

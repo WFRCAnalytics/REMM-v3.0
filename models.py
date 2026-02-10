@@ -1196,10 +1196,14 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
                 adjust49 = (pop_control[pop_control.cid == 49].number_of_population.iloc[0] - cnoadjust[49])/cadjust[49]
                 adjust57 = (pop_control[pop_control.cid == 57].number_of_population.iloc[0] - cnoadjust[57])/cadjust[57]
                 zafteradjust = summary_geog.copy()
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)]*adjust11
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)]*adjust35
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)]*adjust57
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)]*adjust49
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)]*adjust11
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)]*adjust35
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)]*adjust57
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)]*adjust49
+                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11), 'population'] *= adjust11
+                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35), 'population'] *= adjust35
+                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57), 'population'] *= adjust57
+                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49), 'population'] *= adjust49
                 summary_geog = zafteradjust
                 #ENDADJUSTPOPULATION
 
