@@ -112,7 +112,7 @@ def build_networks(settings):
                        edges[["weight"]],twoway=True)
 
     net.precompute(settings['build_networks']['max_distance'])
-    st.close() 
+
     return net
 
 
@@ -120,14 +120,14 @@ def build_networks(settings):
 def neighborhood_vars(net):
     nodes = networks.from_yaml(net, "neighborhood_vars.yaml")
     nodes = nodes.fillna(0)
-    print (nodes.describe())
+    # print (nodes.describe())
     sim.add_table("nodes", nodes)
 
 @sim.step('price_vars')
 def price_vars(net):
     nodes2 = networks.from_yaml(net, "price_vars.yaml")
     nodes2 = nodes2.fillna(0)
-    print (nodes2.describe())
+    # print (nodes2.describe())
     nodes = sim.get_table('nodes')
     nodes = nodes.to_frame().join(nodes2)
     sim.add_table("nodes", nodes)

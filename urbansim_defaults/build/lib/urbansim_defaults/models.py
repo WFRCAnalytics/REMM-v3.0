@@ -4,7 +4,7 @@ from urbansim.utils import networks
 import os
 from urbansim_defaults import utils
 import time
-import datasources
+import datasources_old
 import variables
 import pandana as pdna
 import pandas as pd
@@ -118,7 +118,7 @@ def build_networks(settings):
 def neighborhood_vars(net):
     nodes = networks.from_yaml(net, "neighborhood_vars.yaml")
     nodes = nodes.fillna(0)
-    print nodes.describe()
+    # print nodes.describe()
     sim.add_table("nodes", nodes)
 
 
@@ -126,7 +126,7 @@ def neighborhood_vars(net):
 def price_vars(net):
     nodes2 = networks.from_yaml(net, "price_vars.yaml")
     nodes2 = nodes2.fillna(0)
-    print nodes2.describe()
+    # print nodes2.describe()
     nodes = sim.get_table('nodes')
     nodes = nodes.to_frame().join(nodes2)
     sim.add_table("nodes", nodes)

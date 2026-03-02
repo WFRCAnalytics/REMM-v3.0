@@ -407,11 +407,11 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
             # write final shifters to the submarket_table for use in debugging
             sim.get_table(submarket_table)["price_shifters"] = submarkets_ratios
 
-        print "Running supply and demand"
-        print "Simulated Prices"
-        print buildings[price_col].describe()
-        print "Submarket Price Shifters"
-        print submarkets_ratios.describe()
+        # print "Running supply and demand"
+        # print "Simulated Prices"
+        # print buildings[price_col].describe()
+        # print "Submarket Price Shifters"
+        # print submarkets_ratios.describe()
         # we want new prices on the buildings, not on the units, so apply
         # shifters directly to buildings and ignore unit prices
         sim.add_column(buildings.name,
@@ -419,12 +419,12 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
         new_prices = buildings[price_col] * \
             submarkets_ratios.loc[buildings[submarket_col]].values
         buildings.update_col_from_series(price_col, new_prices)
-        print "Adjusted Prices"
-        print buildings[price_col].describe()
+        # print "Adjusted Prices"
+        # print buildings[price_col].describe()
 
     if len(movers) > vacant_units.sum():
-        print "WARNING: Not enough locations for movers"
-        print "    reducing locations to size of movers for performance gain"
+        # print "WARNING: Not enough locations for movers"
+        # print "    reducing locations to size of movers for performance gain"
         movers = movers.head(vacant_units.sum())
 
     new_units, _ = yaml_to_class(cfg).predict_from_cfg(movers, units, cfg)
@@ -620,13 +620,13 @@ def run_feasibility(parcels, parcel_price_callback,
     if residential_to_yearly:
         df["residential"] *= pf.config.cap_rate
 
-    print "Describe of the yearly rent by use"
-    print df[pf.config.uses].describe()
+    # print "Describe of the yearly rent by use"
+    # print df[pf.config.uses].describe()
 
     d = {}
     forms = forms_to_test or pf.config.forms
     for form in forms:
-        print "Computing feasibility for form %s" % form
+        # print "Computing feasibility for form %s" % form
         allowed = parcel_use_allowed_callback(form).loc[df.index]
         d[form] = pf.lookup(form, df[allowed], only_built=only_built,
                             pass_through=pass_through)

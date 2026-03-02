@@ -269,6 +269,24 @@ def hedonic_simulate(cfg, tbl, join_tbls, out_fname):
 
     df = to_frame(tbl, join_tbls, cfg)
     price_or_rent, _ = yaml_to_class(cfg).predict_from_cfg(df, cfg)
+
+
+    # --- WRITE FULL SERIES TO CSV FOR DEBUGGING ---
+    # debug_df = pd.DataFrame({
+    #     "building_id": price_or_rent.index,
+    #     out_fname: price_or_rent.values,
+    #     "is_finite": np.isfinite(price_or_rent.values)
+    # })
+    # print('cfg:',cfg)
+    # name = os.path.splitext(os.path.basename(cfg))[0]
+    # print('fil:',name)
+    # debug_csv = f"debug{name}_{out_fname}_price_or_rent_rawNew.csv"
+    # debug_df.to_csv(debug_csv, index=False)
+
+    # print(f"[hedonic_simulate] Wrote debug CSV: {debug_csv}")
+
+    
+
     tbl.update_col_from_series(out_fname, price_or_rent)
 
 
@@ -416,11 +434,11 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
             # write final shifters to the submarket_table for use in debugging
             sim.get_table(submarket_table)["price_shifters"] = submarkets_ratios
 
-        print ("Running supply and demand")
-        print ("Simulated Prices")
-        print (buildings[price_col].describe())
-        print ("Submarket Price Shifters")
-        print (submarkets_ratios.describe())
+        # print ("Running supply and demand")
+        # print ("Simulated Prices")
+        # print (buildings[price_col].describe())
+        # print ("Submarket Price Shifters")
+        # print (submarkets_ratios.describe())
         # we want new prices on the buildings, not on the units, so apply
         # shifters directly to buildings and ignore unit prices
         sim.add_column(buildings.name,
@@ -428,8 +446,8 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
         new_prices = buildings[price_col] * \
             submarkets_ratios.loc[buildings[submarket_col]].values
         buildings.update_col_from_series(price_col, new_prices)
-        print ("Adjusted Prices")
-        print (buildings[price_col].describe())
+        # print ("Adjusted Prices")
+        # print (buildings[price_col].describe())
 
     if len(movers) > vacant_units.sum():
         print ("WARNING: Not enough locations for movers")
@@ -556,28 +574,21 @@ def full_transition(agents, agent_controls, year, settings, location_fname):
                          settings['add_columns'])
     hh.rename(columns={'county_id': 'cid'}, inplace=True)
     hh = hh.loc[:, ~hh.columns.duplicated()].copy()
-    pipeline_jobs_path =  os.path.join(misc.data_dir(),  sim.get_injectable('settings')["pipeline_jobs"])
-    if agents.name == 'jobs':
-        if os.path.exists(pipeline_jobs_path):
-            pipeline_jobs = pd.read_csv(pipeline_jobs_path)
-        
-        
-            print('-Adding pipeline jobs')
-            pcls = sim.get_table('parcels').to_frame(['county_id'])
 
-            pipeline_jobs = pipeline_jobs.merge(pcls, how='left', left_on='building_id', right_on='parcel_id')
-            for ind in pipeline_jobs.index:
-                building_id = pipeline_jobs['building_id'][ind]
-                cid = pipeline_jobs['county_id'][ind]
-                sector_id = pipeline_jobs['sector_id'][ind]
-                yearT = pipeline_jobs['year'][ind]
-                jobs = pipeline_jobs['jobs'][ind]
-                if yearT == year:
-                    for x in range(0, jobs):
-                        new_row = pd.DataFrame([{'building_id': building_id, 'cid': cid,'sector_id': sector_id}])
-                        hh = pd.concat([hh, new_row], ignore_index=True)
-        else:
-            print('-Pipeline jobs not found, skipping routine')
+    if agents.name == 'jobs':
+        pipelineJobs = pd.read_csv(os.path.join(misc.data_dir(), "pipeline_jobs_20260125.csv"))
+        pcls = sim.get_table('parcels').to_frame(['county_id'])
+        pipelineJobs = pipelineJobs.merge(pcls, how='left', left_on='building_id', right_on='parcel_id')
+        for ind in pipelineJobs.index:
+            building_id = pipelineJobs['building_id'][ind]
+            cid = pipelineJobs['county_id'][ind]
+            sector_id = pipelineJobs['sector_id'][ind]
+            yearT = pipelineJobs['year'][ind]
+            jobs = pipelineJobs['jobs'][ind]
+            if yearT == year:
+                for x in range(0, jobs):
+                    new_row = pd.DataFrame([{'building_id': building_id, 'cid': cid,'sector_id': sector_id}])
+                    hh = pd.concat([hh, new_row], ignore_index=True)
 
     print ("Total agents before transition: {}".format(len(hh)))
     tran = transition.TabularTotalsTransition(ct, settings['total_column'])
@@ -654,8 +665,8 @@ def run_feasibility(parcels, parcel_price_callback,
     if residential_to_yearly:
         df["residential"] *= pf.config.cap_rate
 
-    print ("Describe of the yearly rent by use")
-    print (df[pf.config.uses].describe())
+    # print ("Describe of the yearly rent by use")
+    # print (df[pf.config.uses].describe())
 
     d = {}
     forms = forms_to_test or pf.config.forms

@@ -52,7 +52,10 @@ def max_far(parcels, scenario, scenario_inputs):
     #downtownTAZ = pd.read_csv(r"DOWNTOWNTAZ\DOWNTOWNTAZ.csv")
     #far[(-parcels.zone_id.isin(list(downtownTAZ.TAZID))) & (far > 0.5)] = 0.5
     #far[parcels.county_id == 4] = far[parcels.county_id == 4] * 0.8
-    far[parcels.county_id == 35] = far[parcels.county_id == 35] * 1.05
+
+    mask = parcels.county_id == 35
+    far.loc[mask] = far.loc[mask] * 1.05
+
     return far
     #far[parcels.parcel_size > 3000000]  = far[parcels.parcel_size > 3000000]* 0.5
 
@@ -61,15 +64,24 @@ def max_dua(parcels, year, scenario, scenario_inputs):
     dua = utils.conditional_upzone(scenario, scenario_inputs, "max_dua", "dua_up").reindex(parcels.index)
     
     #Salt Lake County 10% increase for base year
-    dua[parcels.county_id == 35] = dua[parcels.county_id == 35]*1.1
-    dua[parcels.county_id == 35] = dua[parcels.county_id == 35]*1.05
+    mask = parcels.county_id == 35
+    dua.loc[mask] = dua.loc[mask] * 1.1
+
+    mask = parcels.county_id == 35
+    dua.loc[mask] = dua.loc[mask] * 1.05
+
     
     
     #Davis County 2030 20% increase of capacity. 2040 40% increase of capacity
     if year >= 2025 and year < 2035:
-        dua[parcels.county_id == 11] = dua[parcels.county_id == 11]*1.15
+        mask = parcels.county_id == 11
+        dua.loc[mask] = dua.loc[mask] * 1.15
+
     elif year >=2035:
-        dua[parcels.county_id == 11] = dua[parcels.county_id == 11]*1.3
+        mask = parcels.county_id == 11
+        dua.loc[mask] = dua.loc[mask] * 1.3
+
+
     return dua
         
 @sim.column('parcels', 'max_height', cache=True)
@@ -104,9 +116,11 @@ def row(parcels):
 def redev_friction(parcels,year):
     s = pd.read_csv("data/redev_friction.csv", index_col="parcel_id")
     sredev = s.redev_friction.reindex(parcels.index).fillna(5)
-    sredev[parcels.county_id == 49] = 10
+    sredev.loc[parcels.county_id == 49] = 10
+
     if year >=2035:
-        sredev[parcels.county_id == 11] = sredev[parcels.county_id == 11]/2
+        mask = parcels.county_id == 11
+        sredev.loc[mask] = sredev.loc[mask] / 2
     return sredev
 
 @sim.column('parcels', 'parcel_volume')
@@ -167,7 +181,9 @@ def agriculture(parcels):
 @sim.column('parcels', 'land_cost')
 def land_cost(parcels):
     result = parcels.building_purchase_price + parcels.land_value
-    result[parcels.building_purchase_price > 0] =  result[parcels.building_purchase_price > 0] * parcels.redev_friction
+    mask = parcels.building_purchase_price > 0
+    result.loc[mask] = result.loc[mask] * parcels.redev_friction.loc[mask]
+
     return result
     
 @sim.column('parcels', 'distlrg_res_shift')
@@ -260,7 +276,9 @@ def fwy_exit_dist_tdm_output(parcels, year, settings):
     pdist = np.sqrt((p.x-feloc.loc[0].URBANSIMX)**2 + (p.y-feloc.loc[0].URBANSIMY)**2)
     for i in range(1,len(feloc)):
         pdistx = np.sqrt((p.x-feloc.loc[i].URBANSIMX)**2 + (p.y-feloc.loc[i].URBANSIMY)**2)
-        pdist[pdistx < pdist] = pdistx[pdistx < pdist]
+        mask = pdistx < pdist
+        pdist.loc[mask] = pdistx.loc[mask]
+
     return pdist*0.00018939
 
 @sim.column('parcels', 'rail_stn_dist', cache=True)
@@ -661,6 +679,51 @@ def distmed_63(buildings):
 @sim.column('buildings', 'distmed_64')
 def distmed_64(buildings):
     return (buildings.distmed_id == 64).astype('int32')
+
+@sim.column('buildings', 'distmed_65')
+def distmed_65(buildings):
+    return (buildings.distmed_id == 65).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_66')
+def distmed_66(buildings):
+    return (buildings.distmed_id == 66).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_67')
+def distmed_67(buildings):
+    return (buildings.distmed_id == 67).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_68')
+def distmed_68(buildings):
+    return (buildings.distmed_id == 68).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_69')
+def distmed_69(buildings):
+    return (buildings.distmed_id == 69).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_70')
+def distmed_70(buildings):
+    return (buildings.distmed_id == 70).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_71')
+def distmed_71(buildings):
+    return (buildings.distmed_id == 71).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_72')
+def distmed_72(buildings):
+    return (buildings.distmed_id == 72).astype('int32')
+    
+
+@sim.column('buildings', 'distmed_73')
+def distmed_73(buildings):
+    return (buildings.distmed_id == 73).astype('int32')
+    
     
 @sim.column('buildings', 'zone_1212')
 def zone_1212(buildings):
@@ -670,11 +733,12 @@ def zone_1212(buildings):
 def building_age(buildings, year):
     if year > 2010:
         df = (year - buildings.year_built).clip(lower=0)
-        df[df > 200] = 30
+        df.loc[df > 200] = 30
         return df
     else:
         df = (2010 - buildings.year_built).clip(lower=0)
-        df[df > 200] = 30
+        df.loc[df > 200] = 30
+
         return df
         
 """@sim.column("buildings", "res_price_per_sqft", cache=False)

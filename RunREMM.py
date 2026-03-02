@@ -1,4 +1,4 @@
-
+#C:\Anaconda3Py3.12\envs\remm\lib\site-packages
 import datasources, models, variables, utils#, parcelDistanceToTransitStop
 import orca_wfrc.orca as sim
 import pandas as pd
@@ -33,7 +33,7 @@ sim.run([
         "industrial_developer_slc",
         "industrial_developer_utah",
         "industrial_developer_davis",
-        "industrial_developer_weber",
+        "industrial_developer_weber", #1
         "nrh_ind_simulate",  # industrial price model
         "nrh_ofc_simulate",  # office price model
         "nrh_ret_simulate",  # retail price model
@@ -50,7 +50,7 @@ sim.run([
         "elcm_simulate_slc",  # employment location choice Salt Lake County
         "clear_cache",
         "indicator_export",
-        # 'progression_metrics_export',
+        #'progression_metrics_export',
         # "travel_model_export_no_construction",  # export travel model inputs at TAZ level in specified years
         "travel_model_export_no_construction_TAZ900",  # export travel model inputs at TAZ level in specified years
         "garbage_collect",
@@ -58,4 +58,4 @@ sim.run([
         "travel_model_export_add_construction_TAZ900",  # export travel model inputs at TAZ level in specified years
         # "run_cube",               # call Cube and import travel times in specified years
         # "parcelDistanceToTransitStop"
-    ], iter_vars=range(remm_years['base_year'], remm_years['end_year']))
+    ], iter_vars=range(remm_years['base_year'], remm_years['end_year'])) # change this in settings.yaml

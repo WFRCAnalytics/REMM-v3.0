@@ -116,10 +116,10 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
     available_units = buildings[supply_fname]
     vacant_units = buildings[vacant_fname]
 
-    print("There are %d total available units" % available_units.sum())
-    print("    and %d total choosers" % len(choosers))
-    print("    but there are %d overfull buildings" %
-          len(vacant_units[vacant_units < 0]))
+    # print("There are %d total available units" % available_units.sum())
+    # print("    and %d total choosers" % len(choosers))
+    # print("    but there are %d overfull buildings" %
+    #       len(vacant_units[vacant_units < 0]))
 
     vacant_units = vacant_units[vacant_units > 0]
 
@@ -137,14 +137,14 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
     #     year = sim.get_injectable('year')
     #     units.to_csv(str(year) + 'units_id.csv')
 
-    print("    for a total of %d temporarily empty units" % vacant_units.sum())
-    print("    in %d buildings total in the region" % len(vacant_units))
+    # print("    for a total of %d temporarily empty units" % vacant_units.sum())
+    # print("    in %d buildings total in the region" % len(vacant_units))
 
-    if missing > 0:
-        print("WARNING: %d indexes aren't found in the locations df -" %
-              missing)
-        print("    this is usually because of a few records that don't join ")
-        print("    correctly between the locations df and the aggregations tables")
+    # if missing > 0:
+        # print("WARNING: %d indexes aren't found in the locations df -" %
+        #       missing)
+        # print("    this is usually because of a few records that don't join ")
+        # print("    correctly between the locations df and the aggregations tables")
 
 
     # if cfg =='.\configs\elcm_davis.yaml':
@@ -152,7 +152,7 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
     #   choosers_df.to_csv(str(year) + 'choosers_dfbeforemover.csv')
 
     movers = choosers_df[choosers_df[out_fname] == -1]
-    print("There are %d total movers for this LCM" % len(movers))
+    #print("There are %d total movers for this LCM" % len(movers))
 
     # if cfg =='.\configs\elcm_davis.yaml':
     #   year = sim.get_injectable('year')
@@ -195,11 +195,11 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
             # write final shifters to the submarket_table for use in debugging
             sim.get_table(submarket_table)["price_shifters"] = submarkets_ratios
 
-        print("Running supply and demand")
-        print("Simulated Prices")
-        print(buildings[price_col].describe())
-        print("Submarket Price Shifters")
-        print(submarkets_ratios.describe())
+        #print("Running supply and demand")
+        #print("Simulated Prices")
+        # print(buildings[price_col].describe())
+        #print("Submarket Price Shifters")
+        # print(submarkets_ratios.describe())
         # we want new prices on the buildings, not on the units, so apply
         # shifters directly to buildings and ignore unit prices
         sim.add_column(buildings.name,
@@ -207,8 +207,8 @@ def lcm_simulate(cfg, choosers, buildings, join_tbls, out_fname,
         new_prices = buildings[price_col] * \
             submarkets_ratios.loc[buildings[submarket_col]].values
         buildings.update_col_from_series(price_col, new_prices)
-        print("Adjusted Prices")
-        print(buildings[price_col].describe())
+        #print("Adjusted Prices")
+        # print(buildings[price_col].describe())
 
     #if len(movers) > vacant_units.sum():
     #    print "WARNING: Not enough locations for movers"
@@ -698,7 +698,7 @@ def run_feasibility(parcels, parcel_price_callback,
         df["residential"] *= pf.config.cap_rate
 
     print("Describe of the yearly rent by use")
-    print(df[pf.config.uses].describe())
+    # print(df[pf.config.uses].describe())
 
     d = {}
 
@@ -719,8 +719,17 @@ def run_feasibility(parcels, parcel_price_callback,
             d[form]["residential"] /= pf.config.cap_rate
 
     far_predictions = pd.concat(d.values(), keys=d.keys(), axis=1)
-    far_predictions['residential'].max_profit = far_predictions['residential'].max_profit / np.power(far_predictions['residential'].max_profit_far * far_predictions['residential'].shape_area, 1)
-    far_predictions['industrial'].max_profit = far_predictions['industrial'].max_profit / np.power(far_predictions['industrial'].max_profit_far*far_predictions['industrial'].shape_area,1)
-    far_predictions['retail'].max_profit = far_predictions['retail'].max_profit / np.power(far_predictions['retail'].max_profit_far*far_predictions['retail'].shape_area,1)
-    far_predictions['office'].max_profit = far_predictions['office'].max_profit / np.power(far_predictions['office'].max_profit_far*far_predictions['office'].shape_area,1)
+
+    if 'residential' in far_predictions.columns:
+        far_predictions['residential'].max_profit = far_predictions['residential'].max_profit / np.power(far_predictions['residential'].max_profit_far * far_predictions['residential'].shape_area, 1)
+    
+    if 'industrial' in far_predictions.columns:
+        far_predictions['industrial'].max_profit = far_predictions['industrial'].max_profit / np.power(far_predictions['industrial'].max_profit_far*far_predictions['industrial'].shape_area,1)
+    
+    if 'retail' in far_predictions.columns:
+        far_predictions['retail'].max_profit = far_predictions['retail'].max_profit / np.power(far_predictions['retail'].max_profit_far*far_predictions['retail'].shape_area,1)
+    
+    if 'office' in far_predictions.columns:
+        far_predictions['office'].max_profit = far_predictions['office'].max_profit / np.power(far_predictions['office'].max_profit_far*far_predictions['office'].shape_area,1)
+
     sim.add_table("feasibility", far_predictions)

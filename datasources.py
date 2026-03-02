@@ -290,20 +290,35 @@ def buildings_for_estimation(store):
 @sim.table('buildings_for_estimation_grouped', cache=True)
 def buildings_for_estimation_grouped(store):
     df = store['buildings_for_estimation_grouped']
-    df.unit_price_non_residential[df.trans_year==2000] = (df.unit_price_non_residential[df.trans_year==2000] * 1.27)
-    df.unit_price_non_residential[df.trans_year==2001] = (df.unit_price_non_residential[df.trans_year==2001] * 1.23)
-    df.unit_price_non_residential[df.trans_year==2002] = (df.unit_price_non_residential[df.trans_year==2002] * 1.21)
-    df.unit_price_non_residential[df.trans_year==2003] = (df.unit_price_non_residential[df.trans_year==2003] * 1.19)
-    df.unit_price_non_residential[df.trans_year==2004] = (df.unit_price_non_residential[df.trans_year==2004] * 1.15)
-    df.unit_price_non_residential[df.trans_year==2005] = (df.unit_price_non_residential[df.trans_year==2005] * 1.12)
-    df.unit_price_non_residential[df.trans_year==2006] = (df.unit_price_non_residential[df.trans_year==2006] * 1.08)
-    df.unit_price_non_residential[df.trans_year==2007] = (df.unit_price_non_residential[df.trans_year==2007] * 1.05)
-    df.unit_price_non_residential[df.trans_year==2008] = (df.unit_price_non_residential[df.trans_year==2008] * 1.01)
-    df.unit_price_non_residential[df.trans_year==2009] = (df.unit_price_non_residential[df.trans_year==2009] * 1.02)
-    df.unit_price_non_residential[df.trans_year==2011] = (df.unit_price_non_residential[df.trans_year==2011] * 0.97)
-    df.unit_price_non_residential[df.trans_year==2012] = (df.unit_price_non_residential[df.trans_year==2012] * 0.95)
-    df.unit_price_non_residential[df.trans_year==2013] = (df.unit_price_non_residential[df.trans_year==2013] * 0.94)
-    df.unit_price_non_residential[df.trans_year==2014] = (df.unit_price_non_residential[df.trans_year==2014] * 0.92)
+    # df.unit_price_non_residential[df.trans_year==2000] = (df.unit_price_non_residential[df.trans_year==2000] * 1.27)
+    # df.unit_price_non_residential[df.trans_year==2001] = (df.unit_price_non_residential[df.trans_year==2001] * 1.23)
+    # df.unit_price_non_residential[df.trans_year==2002] = (df.unit_price_non_residential[df.trans_year==2002] * 1.21)
+    # df.unit_price_non_residential[df.trans_year==2003] = (df.unit_price_non_residential[df.trans_year==2003] * 1.19)
+    # df.unit_price_non_residential[df.trans_year==2004] = (df.unit_price_non_residential[df.trans_year==2004] * 1.15)
+    # df.unit_price_non_residential[df.trans_year==2005] = (df.unit_price_non_residential[df.trans_year==2005] * 1.12)
+    # df.unit_price_non_residential[df.trans_year==2006] = (df.unit_price_non_residential[df.trans_year==2006] * 1.08)
+    # df.unit_price_non_residential[df.trans_year==2007] = (df.unit_price_non_residential[df.trans_year==2007] * 1.05)
+    # df.unit_price_non_residential[df.trans_year==2008] = (df.unit_price_non_residential[df.trans_year==2008] * 1.01)
+    # df.unit_price_non_residential[df.trans_year==2009] = (df.unit_price_non_residential[df.trans_year==2009] * 1.02)
+    # df.unit_price_non_residential[df.trans_year==2011] = (df.unit_price_non_residential[df.trans_year==2011] * 0.97)
+    # df.unit_price_non_residential[df.trans_year==2012] = (df.unit_price_non_residential[df.trans_year==2012] * 0.95)
+    # df.unit_price_non_residential[df.trans_year==2013] = (df.unit_price_non_residential[df.trans_year==2013] * 0.94)
+    # df.unit_price_non_residential[df.trans_year==2014] = (df.unit_price_non_residential[df.trans_year==2014] * 0.92)
+    df.loc[df["trans_year"] == 2000, "unit_price_non_residential"] *= 1.27
+    df.loc[df["trans_year"] == 2001, "unit_price_non_residential"] *= 1.23
+    df.loc[df["trans_year"] == 2002, "unit_price_non_residential"] *= 1.21
+    df.loc[df["trans_year"] == 2003, "unit_price_non_residential"] *= 1.19
+    df.loc[df["trans_year"] == 2004, "unit_price_non_residential"] *= 1.15
+    df.loc[df["trans_year"] == 2005, "unit_price_non_residential"] *= 1.12
+    df.loc[df["trans_year"] == 2006, "unit_price_non_residential"] *= 1.08
+    df.loc[df["trans_year"] == 2007, "unit_price_non_residential"] *= 1.05
+    df.loc[df["trans_year"] == 2008, "unit_price_non_residential"] *= 1.01
+    df.loc[df["trans_year"] == 2009, "unit_price_non_residential"] *= 1.02
+    df.loc[df["trans_year"] == 2011, "unit_price_non_residential"] *= 0.97
+    df.loc[df["trans_year"] == 2012, "unit_price_non_residential"] *= 0.95
+    df.loc[df["trans_year"] == 2013, "unit_price_non_residential"] *= 0.94
+    df.loc[df["trans_year"] == 2014, "unit_price_non_residential"] *= 0.92
+
     return df.dropna(subset=['building_type_id']).query('building_type_id > 0')
     
 @sim.table('buildings', cache=True)
@@ -384,8 +399,16 @@ def zoning_baseline(store, settings, year):
 #                  right_index=True)
     df = store['zoning_baseline']
 
-    if os.path.exists(os.path.join(misc.data_dir(),  sim.get_injectable('settings')["policy_override"])):
-        update = pd.read_csv(os.path.join(misc.data_dir(),  sim.get_injectable('settings')["policy_override"]))
+    #if os.path.exists(os.path.join(misc.data_dir(), "zoning_parcels.csv")):
+    #    df['parcel_id'] = df.index
+    #    alter = pd.read_csv(os.path.join(misc.data_dir(), "zoning_parcels.csv"), index_col='parcel_id')
+    #    df = pd.merge(df, alter, how='left', left_index=True, right_index=True, suffixes=('','_x'))
+    #    df.max_dua[df.max_dua_x.notnull()] = df.max_dua_x[df.max_dua_x.notnull()]
+    #    df.max_far[df.max_far_x.notnull()] = df.max_far_x[df.max_far_x.notnull()]
+    #    df = df.drop(['max_dua_x','max_far_x'], axis=1)
+    policy = os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p_20260226_noBuild2023.csv")
+    if os.path.exists(policy):
+        update = pd.read_csv(policy)
         update = update[update.year<=year]
         update = update.sort_values(by='year', ascending=1)
         update = update.drop_duplicates(subset="parcel_id",keep="last")
@@ -394,8 +417,12 @@ def zoning_baseline(store, settings, year):
             return df
         df2 = pd.merge(df, update, how='left', left_index=True, right_on='parcel_id', suffixes=('','_x'))
         df2.set_index('parcel_id', inplace=True)
-        df2.max_dua[df2.max_dua_x.notnull()] = df2.max_dua_x[df2.max_dua_x.notnull()]
-        df2.max_dua[df2.max_dua==0] = np.nan
+        # df2.max_dua[df2.max_dua_x.notnull()] = df2.max_dua_x[df2.max_dua_x.notnull()]
+        mask = df2["max_dua_x"].notnull()
+        df2.loc[mask, "max_dua"] = df2.loc[mask, "max_dua_x"]
+
+        # df2.max_dua[df2.max_dua==0] = np.nan
+        df2.loc[df2["max_dua"] == 0, "max_dua"] = np.nan
         df2.max_far[df2.max_far_x.notnull()] = df2.max_far_x[df2.max_far_x.notnull()]
         df2.max_far[df2.max_far==0] = np.nan
         df2.type1[df2.type1_x==1] = 1
@@ -441,7 +468,10 @@ def households(store, settings):
 
     if settings.get("remove_invalid_building_ids", True):
         # have to do it this way to prevent circular reference
-        df.building_id.loc[~df.building_id.isin(store['buildings'].index)] = -1
+        # df.building_id.loc[~df.building_id.isin(store['buildings'].index)] = -1
+        mask = ~df["building_id"].isin(store["buildings"].index)
+        df.loc[mask, "building_id"] = -1
+
 
     fill_nas_cfg = settings.get("table_reprocess", None)
     if fill_nas_cfg is not None:

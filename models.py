@@ -22,7 +22,7 @@ def hedonic_export(hedonic_output, filepath):
     h_est = pd.DataFrame(columns=['Submodel','Variable','Coefficient','T-Score','Std. Error','R-Squared','Adj. R-Squared'])
     for sub in h_dict['models'].keys():
         params = h_dict['models'][sub]['fit_parameters']
-        print(type(params.keys()))
+        #print(type(params.keys()))
         vars = params['Coefficient'].keys()
         temp = pd.DataFrame(columns=(['Variable','R-Squared','Adj. R-Squared'] + list(params.keys())))
         for v in vars:
@@ -141,6 +141,11 @@ def nrh_ind_simulate(buildings, aggregations):
                                   "unit_price_non_residential")
     nrh_ind_slc = utils.hedonic_simulate("nrh_ind_slc.yaml", buildings, aggregations,
                                   "unit_price_non_residential")
+    # print("buildings columns sample:", list(buildings.columns)[:100])
+    # print("has distmed_67?", "distmed_67" in buildings.columns)
+    # print("distmed cols:", [c for c in buildings.columns if c.startswith("distmed_")][:70])
+    # print("max distmed id:", max([int(c.split("_")[1]) for c in buildings.columns if c.startswith("distmed_")], default=None))
+
     nrh_ind_utah = utils.hedonic_simulate("nrh_ind_utah.yaml", buildings, aggregations,
                                   "unit_price_non_residential")
     return 1
@@ -520,7 +525,7 @@ def trend_calibration(year):
 
 
 @sim.step('pipeline_projects')
-def pipeline_projects(year, settings):
+def pipeline_projects(year):
     # get buildings table
     bt = sim.get_table("buildings")
     b = bt.to_frame(bt.local_columns)
@@ -534,8 +539,7 @@ def pipeline_projects(year, settings):
     jobs = jobst.to_frame(jobst.local_columns)
 
     # read in pipeline buildings
-    pipeline = pd.read_csv(os.path.join(misc.data_dir(),settings['pipeline_buildings']))
-
+    pipeline = pd.read_csv("data\pipeline_buildings_20260209.csv")
     pipeline = pipeline[(pipeline.year_built == year)]
 
     # identify buildings that need to be demolished
@@ -1196,14 +1200,10 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
                 adjust49 = (pop_control[pop_control.cid == 49].number_of_population.iloc[0] - cnoadjust[49])/cadjust[49]
                 adjust57 = (pop_control[pop_control.cid == 57].number_of_population.iloc[0] - cnoadjust[57])/cadjust[57]
                 zafteradjust = summary_geog.copy()
-                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)]*adjust11
-                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)]*adjust35
-                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)]*adjust57
-                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)]*adjust49
-                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11), 'population'] *= adjust11
-                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35), 'population'] *= adjust35
-                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57), 'population'] *= adjust57
-                zafteradjust.loc[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49), 'population'] *= adjust49
+                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)]*adjust11
+                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)]*adjust35
+                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)]*adjust57
+                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)]*adjust49
                 summary_geog = zafteradjust
                 #ENDADJUSTPOPULATION
 
@@ -1307,7 +1307,7 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
         pcls = sim.get_table('parcels').to_frame(['county_id'])
         bldgs = sim.get_table('buildings').to_frame(['parcel_id'])
         bldgs = bldgs.merge(pcls, left_on='parcel_id', right_index=True, how='left')
-        base_jobs = base_jobs.merge(bldgs, left_on='building_id', right_index=True, how='left')
+        base_jobs = base_jobs.drop('county_id',axis=1).merge(bldgs, left_on='building_id', right_index=True, how='left')
         del bldgs
         del pcls
         base_jobs_pivot = pd.pivot_table(base_jobs, values='county_id', index = 'building_id', columns='sector_id', aggfunc='count').reset_index()
@@ -1622,6 +1622,9 @@ def travel_model_export_no_constuction(year, settings, jobs, households, buildin
     tdm_output.HHSIZE[tdm_output.TOTHH > 0] = tdm_output.HHPOP[tdm_output.TOTHH > 0]/tdm_output.TOTHH[tdm_output.TOTHH > 0]
 
     inputdir = settings['tdm']['input_dir'] + '/' # come back to this when gui is farther along
+    if not os.path.exists(inputdir):
+        os.makedirs(inputdir)  
+        
     filename = "taz832_SE_" + str(year) + ".csv"
     filepath = os.path.join(inputdir, filename)
 
@@ -1636,113 +1639,6 @@ def travel_model_export_no_constuction(year, settings, jobs, households, buildin
     unit_output['job_spaces'] = buildings.groupby("zone_id").job_spaces.sum()
     unit_output = unit_output.fillna(0)
     unit_output.to_csv(unitfilepath)
-
-
-@sim.step('travel_model_export_add_construction')
-def travel_model_export_add_constuction(year, settings, jobs, households, buildings, parcels):
-
-    buildings = buildings.to_frame()
-    inputdir = settings['tdm']['input_dir']+'/'
-    filename = "taz832_SE_" + str(year) + ".csv"
-    filepath = os.path.join(inputdir, filename)
-
-    tdm_output = pd.read_csv(filepath,index_col = ";TAZID")
-
-    employment_control = pd.read_csv("data/employment_controls.csv")
-
-    #Construction Job
-    coj = employment_control[(employment_control.year == year)&(employment_control.sector_id == 2)]
-    if year == settings['remm']['base_year']:
-        cbuilding = buildings[(buildings.year_built == year) & (buildings.note == 'base')]
-    else:
-        cbuilding = buildings[buildings.year_built == year]
-    tdm_output['new_building_sqft'] = cbuilding.groupby("zone_id").building_sqft.sum()
-    tdm_output = tdm_output.fillna(0)
-
-    coj_adjust57 = 1 / 2200
-    coj_adjust11 = 1 / 2200
-    coj_adjust35 = 1 / 2200
-    coj_adjust49 = 1 / 2200
-    tdm_output['FM_CONS'] = 0
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 57] * coj_adjust57
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 11] * coj_adjust11
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 35] * coj_adjust35
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 49] * coj_adjust49
-    tdm_output.FM_CONS = np.round(tdm_output.FM_CONS)
-
-    # secondadjustment
-    c_coj_adjust = tdm_output.groupby("CO_FIPS").FM_CONS.sum()
-    tdm_output['HHJobs'] = tdm_output['TOTHH'] + tdm_output['RETL'] + tdm_output['FOOD'] + tdm_output['MANU'] + tdm_output['WSLE'] + tdm_output['OFFI'] + tdm_output['GVED']+ tdm_output['HLTH'] + tdm_output['OTHR']
-    c_coj_adjustSE = tdm_output.groupby("CO_FIPS").HHJobs.sum()
-    coj_adjust57 = ((coj[coj.cid == 57].number_of_jobs.iloc[0]) - c_coj_adjust[57]) / c_coj_adjustSE[57]
-    coj_adjust11 = ((coj[coj.cid == 11].number_of_jobs.iloc[0]) - c_coj_adjust[11]) / c_coj_adjustSE[11]
-    coj_adjust35 = ((coj[coj.cid == 35].number_of_jobs.iloc[0]) - c_coj_adjust[35]) / c_coj_adjustSE[35]
-    coj_adjust49 = ((coj[coj.cid == 49].number_of_jobs.iloc[0]) - c_coj_adjust[49]) / c_coj_adjustSE[49]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.HHJobs[tdm_output.CO_FIPS == 57] * coj_adjust57 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 57]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.HHJobs[tdm_output.CO_FIPS == 11] * coj_adjust11 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 11]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.HHJobs[tdm_output.CO_FIPS == 35] * coj_adjust35 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 35]
-    tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.HHJobs[tdm_output.CO_FIPS == 49] * coj_adjust49 + \
-                                                   tdm_output.FM_CONS[tdm_output.CO_FIPS == 49]
-    # zcoj = tdm_output[(tdm_output.new_building_sqft > 0)]
-    # c_coj_adjust = zcoj.groupby("CO_FIPS").new_building_sqft.sum()
-    # #firstadjustment
-    #
-    # if 57 in c_coj_adjust.index.tolist():
-    #     coj_adjust57 = (coj[coj.cid == 57].number_of_jobs.iloc[0])*1.0/c_coj_adjust[57]
-    # else:
-    #     coj_adjust57 = 0
-    #
-    # if 11 in c_coj_adjust.index.tolist():
-    #     coj_adjust11 =  (coj[coj.cid == 11].number_of_jobs.iloc[0])*1.0/c_coj_adjust[11]
-    # else:
-    #     coj_adjust11 = 0
-    #
-    # if 35 in c_coj_adjust.index.tolist():
-    #     coj_adjust35 =  (coj[coj.cid == 35].number_of_jobs.iloc[0])*1.0/c_coj_adjust[35]
-    # else:
-    #     coj_adjust35 = 0
-    #
-    # if 49 in c_coj_adjust.index.tolist():
-    #     coj_adjust49 =  (coj[coj.cid == 49].number_of_jobs.iloc[0])*1.0/c_coj_adjust[49]
-    # else:
-    #     coj_adjust49 = 0
-    #
-    # tdm_output['FM_CONS'] = 0
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 57]*coj_adjust57
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 11]*coj_adjust11
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 35]*coj_adjust35
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.new_building_sqft[tdm_output.CO_FIPS == 49]*coj_adjust49
-    # tdm_output.FM_CONS = np.round(tdm_output.FM_CONS)
-    # #secondadjustment
-    # c_coj_adjust = tdm_output.groupby("CO_FIPS").FM_CONS.sum()
-    # coj_adjust57 =  (coj[coj.cid == 57].number_of_jobs.iloc[0])*1.0/c_coj_adjust[57]
-    # coj_adjust11 =  (coj[coj.cid == 11].number_of_jobs.iloc[0])*1.0/c_coj_adjust[11]
-    # coj_adjust35 =  (coj[coj.cid == 35].number_of_jobs.iloc[0])*1.0/c_coj_adjust[35]
-    # coj_adjust49 =  (coj[coj.cid == 49].number_of_jobs.iloc[0])*1.0/c_coj_adjust[49]
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 57] = tdm_output.FM_CONS[tdm_output.CO_FIPS == 57]*coj_adjust57
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 11] = tdm_output.FM_CONS[tdm_output.CO_FIPS == 11]*coj_adjust11
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 35] = tdm_output.FM_CONS[tdm_output.CO_FIPS == 35]*coj_adjust35
-    # tdm_output.FM_CONS[tdm_output.CO_FIPS == 49] = tdm_output.FM_CONS[tdm_output.CO_FIPS == 49]*coj_adjust49
-
-    tdm_output['ALLEMP'] = tdm_output['RETL']+tdm_output['FOOD']+tdm_output['MANU']+tdm_output['WSLE']+tdm_output['OFFI']+tdm_output['GVED']+tdm_output['HLTH']+tdm_output['OTHR']+tdm_output['FM_AGRI']+tdm_output['FM_MING']+tdm_output['FM_CONS']+tdm_output['HBJ']
-
-    tdm_output['RETEMP'] = tdm_output['RETL'] + tdm_output['FOOD']
-    tdm_output['INDEMP'] = tdm_output['MANU'] + tdm_output['WSLE']
-    tdm_output['OTHEMP'] = tdm_output['OFFI'] + tdm_output['GVED']+ tdm_output['HLTH'] + tdm_output['OTHR']
-    tdm_output['TOTEMP'] = tdm_output['RETEMP'] + tdm_output['INDEMP']+ tdm_output['OTHEMP']
-
-
-    tdm_output = tdm_output[["CO_TAZID","TOTHH","HHPOP","HHSIZE","TOTEMP","RETEMP","INDEMP","OTHEMP","ALLEMP","RETL","FOOD","MANU","WSLE","OFFI","GVED","HLTH","OTHR","FM_AGRI","FM_MING","FM_CONS","HBJ","AVGINCOME","Enrol_Elem","Enrol_Midl","Enrol_High","CO_FIPS","CO_NAME"]]
-
-    inputdir = settings['tdm']['input_dir']+'/'
-    filename = "taz832_SE_" + str(year) + ".csv"
-    filepath = os.path.join(inputdir, filename)
-
-    tdm_output.to_csv(filepath)
-
 
 
 @sim.step('travel_model_export_add_construction')
@@ -1966,7 +1862,7 @@ def utility_restriction(year, settings):
 
     if year in restriction_years:
         
-        print("--Utility Restriction start")
+        # print("--Utility Restriction start")
 
         # select which counties to run utility restriction for using their fips code
         counties_to_restrict = [57,49]
@@ -2011,7 +1907,7 @@ def utility_restriction(year, settings):
         grid_selection = grid[grid['adj_units'] >= 10].copy()
 
         # buffer the grid subset by 1/2 mile
-        print('--buffering grids...')
+        # print('--buffering grids...')
         grid_selection['geometry'] = grid_selection['geometry'].buffer(804.672)
         grid_selection.to_file(os.path.join('Outputs',f"resdevbuffer_{year}.shp"))
         
@@ -2028,11 +1924,11 @@ def utility_restriction(year, settings):
         parcel_centroids = gpd.GeoDataFrame(p, geometry=gpd.points_from_xy(p['x'], p['y'], crs=crs))
 
         # get the points that are not within the developed parcel buffer and export
-        print('--overlaying features...')
+        # print('--overlaying features...')
         parcel_centroids = parcel_centroids.overlay(grid_selection, how='difference')
         
         # export restricted parcel ids table
-        print('--exporting parcel ids...')
+        # print('--exporting parcel ids...')
         parcel_centroids = parcel_centroids[['parcel_id','county_id']].copy()
         parcel_centroids.to_csv(os.path.join('Outputs','restricted_parcels.csv'))
         
@@ -2043,7 +1939,7 @@ def utility_restriction(year, settings):
         del end_year
         del year_increment
         del restriction_years
-        print("--Utility Restriction end")
+        # print("--Utility Restriction end")
         os.chdir(REMMdir)
 
     
@@ -2102,15 +1998,18 @@ def zone_ind_estimate(zones):
 @sim.step('travel_model_export_no_construction_TAZ900')
 def travel_model_export_no_construction_TAZ900(year, settings, jobs, households, buildings, parcels):
     households = households.to_frame()
+   
     jobs = jobs.to_frame()
     parcels = parcels.to_frame()
     parcels = parcels.reset_index()
     parcels['parcel_id_REMM'] = parcels['parcel_id']
     parcelsTAZ900 = parcels[['parcel_id_REMM','TAZID_900']]
     households = pd.merge(households, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
+
     jobs = pd.merge(jobs, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
-    tdm_output = pd.read_csv(os.path.join(misc.data_dir(),settings['tdm_template_v900']), index_col=";TAZID")
+    tdm_output = pd.read_csv("data/tdm_template_TAZ900.csv", index_col=";TAZID")
     tdm_output['TOTHH'] = households.groupby("TAZID_900").building_id.count()
+
     tdm_output['HHPOP'] = households.groupby("TAZID_900").persons.sum()
     tdm_output['RETL'] = jobs[jobs.sector_id == 9].groupby("TAZID_900").building_id.count()
     tdm_output['FOOD'] = jobs[jobs.sector_id == 1].groupby("TAZID_900").building_id.count()
@@ -2125,6 +2024,7 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
     pop_control = pop_control[pop_control.year == year]
     c_pop = tdm_output.groupby("CO_FIPS").HHPOP.sum()
     c_hh = tdm_output.groupby("CO_FIPS").TOTHH.sum()
+
     adjust57 = (pop_control[pop_control.cid == 57].number_of_population.iloc[0] - c_hh[57]) * 1.0 / (
                 c_pop[57] - c_hh[57])
     adjust11 = (pop_control[pop_control.cid == 11].number_of_population.iloc[0] - c_hh[11]) * 1.0 / (
@@ -2134,6 +2034,7 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
     adjust49 = (pop_control[pop_control.cid == 49].number_of_population.iloc[0] - c_hh[49]) * 1.0 / (
                 c_pop[49] - c_hh[49])
     zafteradjust = tdm_output.copy()
+    
     zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] -
                                                       zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]) * adjust57 + \
                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]
@@ -2147,6 +2048,7 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
                                                       zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]) * adjust49 + \
                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]
     tdm_output = zafteradjust.copy()
+
 
     employment_control = pd.read_csv("data/employment_controls.csv")
     # Home-based Job
@@ -2225,11 +2127,16 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
     tdm_output.HHSIZE[tdm_output.TOTHH > 0] = tdm_output.HHPOP[tdm_output.TOTHH > 0] / tdm_output.TOTHH[
         tdm_output.TOTHH > 0]
 
+
     inputdir = settings['tdm']['input_dir'] + '/'  # come back to this when gui is farther along
+    if not os.path.exists(inputdir):
+        os.makedirs(inputdir)  
+    
     filename = "SE_" + str(year) + ".csv"
     filepath = os.path.join(inputdir, filename)
 
     tdm_output.to_csv(filepath)
+
 
     buildings = buildings.to_frame(['residential_units', 'job_spaces', 'zone_id'])
     unitfilename = "UNITS_JOBSPACES_" + str(year) + ".csv"
