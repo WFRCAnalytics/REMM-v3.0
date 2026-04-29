@@ -543,7 +543,7 @@ def pipeline_projects(year):
     pipeline = pipeline[(pipeline.year_built == year)]
 
     # identify buildings that need to be demolished
-    demolition = pipeline[(pipeline.DEVTYPE == "redevelop") | (pipeline.DEVTYPE == "demolition")]
+    demolition = pipeline[(pipeline.DEVTYPE == "redevelop") | (pipeline.DEVTYPE == "demolition") | (pipeline.DEVTYPE == "demo_nodev")]
     demolition_buildings = b.parcel_id.isin(demolition.parcel_id)
     #demolition_buildings.to_csv('demolition_buildings.csv')
     building_step_1 = b[np.logical_not(demolition_buildings)]
@@ -1383,8 +1383,8 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
     parcels['has_buildings'] = parcels_output_previous['has_buildings']
 
     # identify new buildings and indicate whether development or redevelopment has occurred
-    simulated_buildings = buildings[(buildings['note'].isin(['simulated', 'pipeline'] == True)) & (buildings.year_built == year)]
-    ids = list(set(simulated_buildings ["parcel_id"].to_list()))
+    new_buildings = buildings[(buildings['note'].isin(['simulated', 'pipeline']) == True) & (buildings['year_built'] == year)]
+    ids = list(set(new_buildings ["parcel_id"].to_list()))
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==0)), 'was_developed'] = 1
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==1)), 'was_redeveloped'] = 1
 

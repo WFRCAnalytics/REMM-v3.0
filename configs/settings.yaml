@@ -4,7 +4,7 @@ aggregation_tables:
 
 remm:
     base_year: 2023
-    end_year: 2056
+    end_year: 2030
     indicator_years: [2023,2028,2032,2037,2042,2050,2055] 
     
 tdm:
@@ -148,7 +148,7 @@ pusher:
   region: salt lake
 
 
-store: remm_data_base_year_2023_20260216.h5
+store: remm_data_base_year_2023_20260321.h5
 
 
 scenario: baseline

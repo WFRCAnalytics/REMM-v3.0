@@ -50,7 +50,7 @@ sim.run([
         "elcm_simulate_slc",  # employment location choice Salt Lake County
         "clear_cache",
         "indicator_export",
-        #'progression_metrics_export',
+        'progression_metrics_export',
         # "travel_model_export_no_construction",  # export travel model inputs at TAZ level in specified years
         "travel_model_export_no_construction_TAZ900",  # export travel model inputs at TAZ level in specified years
         "garbage_collect",

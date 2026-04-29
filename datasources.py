@@ -406,8 +406,9 @@ def zoning_baseline(store, settings, year):
     #    df.max_dua[df.max_dua_x.notnull()] = df.max_dua_x[df.max_dua_x.notnull()]
     #    df.max_far[df.max_far_x.notnull()] = df.max_far_x[df.max_far_x.notnull()]
     #    df = df.drop(['max_dua_x','max_far_x'], axis=1)
-    policy = os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p_20260226_noBuild2023.csv")
+    policy = os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p_20260321_noBuild2023.csv")
     if os.path.exists(policy):
+        print('--Policy input found!')
         update = pd.read_csv(policy)
         update = update[update.year<=year]
         update = update.sort_values(by='year', ascending=1)
