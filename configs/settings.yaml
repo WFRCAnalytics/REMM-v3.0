@@ -1,12 +1,26 @@
+store: remm_data_base_year_2023_20260801.h5
+pipeline_jobs: pipeline_jobs_20260125.csv
+pipeline_buildings: pipeline_buildings_20260727.csv
+tdm_template_v900: tdm_template_TAZ900.csv
+policy_override: zoning_parcels_p_20260801_noBuild2023.csv
+
+scenario: baseline
+
+scenario_inputs:
+  baseline:
+    zoning_table_name: zoning_baseline
+  test:
+    zoning_table_name: zoning_test
+
 aggregation_tables:
   - nodes
   - zones
 
 remm:
     base_year: 2023
-    end_year: 2056
-    indicator_years: [2023,2028,2032,2037,2042,2050,2055] 
-    
+    end_year: 2066
+    indicator_years: [2023,2028,2032,2037,2042,2050,2055, 2060, 2065] 
+
 tdm:
   run_years:
     - 2023
@@ -25,6 +39,7 @@ tdm:
   output_distance: 6_REMM/parceldistance2transitstops.dbf
   output_fwy: 6_REMM/FreewayExits.DBF
   python2_dir: C:\Python27\ArcGIS10.6
+
 
 set_nan_price_to_zero: True
 
@@ -148,17 +163,7 @@ pusher:
   region: salt lake
 
 
-store: remm_data_base_year_2023_20260321.h5
 
-
-scenario: baseline
-
-
-scenario_inputs:
-  baseline:
-    zoning_table_name: zoning_baseline
-  test:
-    zoning_table_name: zoning_test
 
 
 # this maps Synthicity's 25 employment categories to

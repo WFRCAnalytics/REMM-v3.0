@@ -406,7 +406,9 @@ def zoning_baseline(store, settings, year):
     #    df.max_dua[df.max_dua_x.notnull()] = df.max_dua_x[df.max_dua_x.notnull()]
     #    df.max_far[df.max_far_x.notnull()] = df.max_far_x[df.max_far_x.notnull()]
     #    df = df.drop(['max_dua_x','max_far_x'], axis=1)
-    policy = os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p_20260429_noBuild2023_SSTEST.csv")
+    # policy = os.path.join(misc.data_dir(), "scenario_inputs", settings['scenario'], "zoning_parcels_p_20260504_noBuild2023.csv")
+    policy = os.path.join(misc.data_dir(), 'scenario_inputs',  sim.get_injectable('settings')["policy_override"])
+    print(os.path.realpath(policy))
     if os.path.exists(policy):
         print('--Policy input found!')
         update = pd.read_csv(policy)
@@ -424,36 +426,37 @@ def zoning_baseline(store, settings, year):
 
         # df2.max_dua[df2.max_dua==0] = np.nan
         df2.loc[df2["max_dua"] == 0, "max_dua"] = np.nan
-        df2.max_far[df2.max_far_x.notnull()] = df2.max_far_x[df2.max_far_x.notnull()]
-        df2.max_far[df2.max_far==0] = np.nan
-        df2.type1[df2.type1_x==1] = 1
-        df2.type1[df2.type1_x==0] = 0
-        df2.type2[df2.type2_x==1] = 1
-        df2.type2[df2.type2_x==0] = 0
-        df2.type3[df2.type3_x==1] = 1
-        df2.type3[df2.type3_x==0] = 0
-        df2.type4[df2.type4_x==1] = 1
-        df2.type4[df2.type4_x==0] = 0
-        df2.type5[df2.type5_x==1] = 1
-        df2.type5[df2.type5_x==0] = 0
-        df2.type6[df2.type6_x==1] = 1
-        df2.type6[df2.type6_x==0] = 0
-        df2.type7[df2.type7_x==1] = 1
-        df2.type7[df2.type7_x==0] = 0
-        df2.type8[df2.type8_x==1] = 1
-        df2.type8[df2.type8_x==0] = 0
+        df2.loc[df2["max_far_x"].notnull(), 'max_far'] = df2.loc[df2["max_far_x"].notnull(), 'max_far_x']
+        df2.loc[df2["max_far"] == 0, "max_far"] = np.nan
+        df2.loc[df2["type1_x"] == 1, "type1"] = 1
+        df2.loc[df2["type1_x"] == 0, "type1"] = 0
+        df2.loc[df2["type2_x"] == 1, "type2"] = 1
+        df2.loc[df2["type2_x"] == 0, "type2"] = 0
+        df2.loc[df2["type3_x"] == 1, "type3"] = 1
+        df2.loc[df2["type3_x"] == 0, "type3"] = 0
+        df2.loc[df2["type4_x"] == 1, "type4"] = 1
+        df2.loc[df2["type4_x"] == 0, "type4"] = 0
+        df2.loc[df2["type5_x"] == 1, "type5"] = 1
+        df2.loc[df2["type5_x"] == 0, "type5"] = 0
+        df2.loc[df2["type6_x"] == 1, "type6"] = 1
+        df2.loc[df2["type6_x"] == 0, "type6"] = 0
+        df2.loc[df2["type7_x"] == 1, "type7"] = 1
+        df2.loc[df2["type7_x"] == 0, "type7"] = 0
+        df2.loc[df2["type8_x"] == 1, "type8"] = 1
+        df2.loc[df2["type8_x"] == 0, "type8"] = 0
         df2 = df2.drop(['year','max_dua_x','max_far_x','type1_x','type2_x','type3_x','type4_x','type5_x','type6_x','type7_x','type8_x'], axis=1)
         df2.max_height = 999
         
         if os.path.exists(os.path.join('UtilityRestriction/Outputs', "restricted_parcels.csv")):
             restricted_parcel_table = pd.read_csv(os.path.join('UtilityRestriction/Outputs', "restricted_parcels.csv"))
             restricted_ids = restricted_parcel_table.parcel_id.unique()
-            df2.type1[df2.index.isin(restricted_ids)] = 0
-            df2.type2[df2.index.isin(restricted_ids)] = 0
-            df2.type4[df2.index.isin(restricted_ids)] = 0
-            df2.type5[df2.index.isin(restricted_ids)] = 0
+            df2.loc[df2.index.isin(restricted_ids), "type1"] = 0
+            df2.loc[df2.index.isin(restricted_ids), "type2"] = 0
+            df2.loc[df2.index.isin(restricted_ids), "type4"] = 0
+            df2.loc[df2.index.isin(restricted_ids), "type5"] = 0
         return df2
     else:
+        raise FileNotFoundError("Policy Override not found.")
         df.max_height = 999
         return df
     

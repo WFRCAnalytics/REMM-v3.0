@@ -126,7 +126,8 @@ def jobs(store, settings):
 
     if settings.get("remove_invalid_building_ids", True):
         # have to do it this way to prevent circular reference
-        df.building_id.loc[~df.building_id.isin(store['buildings'].index)] = -1
+        # df.building_id.loc[~df.building_id.isin(store['buildings'].index)] = -1
+        df.loc[~df['building_id'].isin(store['buildings'].index), 'building_id'] = -1
 
     fill_nas_cfg = settings.get("table_reprocess", {}).get("jobs", None)
     if fill_nas_cfg is not None:

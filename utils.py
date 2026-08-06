@@ -420,7 +420,8 @@ def run_developer(forms, agents, buildings, buildings_all, supply_fname, parcel_
             displaced_agents = agents.building_id.isin(drop_buildings_all.index)
             print("Unplaced {} before: {}".format(tbl, len(agents.query(
                 "building_id == -1"))))
-            agents.building_id[displaced_agents] = -1
+            # agents.building_id[displaced_agents] = -1
+            agents.loc[displaced_agents, 'building_id'] = -1
             print("Unplaced {} after: {}".format(tbl, len(agents.query(
                 "building_id == -1"))))
             sim.add_table(tbl, agents)

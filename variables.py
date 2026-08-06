@@ -63,23 +63,39 @@ def max_far(parcels, scenario, scenario_inputs):
 def max_dua(parcels, year, scenario, scenario_inputs):
     dua = utils.conditional_upzone(scenario, scenario_inputs, "max_dua", "dua_up").reindex(parcels.index)
     
-    #Salt Lake County 10% increase for base year
+    # Salt Lake County increase in household capacity
     mask = parcels.county_id == 35
-    dua.loc[mask] = dua.loc[mask] * 1.1
+    dua.loc[mask] = dua.loc[mask] * 1.15
 
-    mask = parcels.county_id == 35
-    dua.loc[mask] = dua.loc[mask] * 1.05
-
-    
-    
-    #Davis County 2030 20% increase of capacity. 2040 40% increase of capacity
-    if year >= 2025 and year < 2035:
+    # Davis County 2030 20% increase of capacity. 2040 40% increase of capacity
+    if year >= 2027 and year < 2030:
         mask = parcels.county_id == 11
-        dua.loc[mask] = dua.loc[mask] * 1.15
+        dua.loc[mask] = dua.loc[mask] * 1.5
 
-    elif year >=2035:
+    elif year >=2030 and year < 2040:
         mask = parcels.county_id == 11
-        dua.loc[mask] = dua.loc[mask] * 1.3
+        dua.loc[mask] = dua.loc[mask] * 1.75
+
+    elif year >=2040 and year < 2050:
+        mask = parcels.county_id == 11
+        dua.loc[mask] = dua.loc[mask] * 2
+
+    elif year >=2050:
+        mask = parcels.county_id == 11
+        dua.loc[mask] = dua.loc[mask] * 2.5
+
+    # Weber county increase in household capacity
+    if year >=2030 and year < 2040:
+            mask = parcels.county_id == 57
+            dua.loc[mask] = dua.loc[mask] * 1.25
+    
+    elif year >=2040 and year < 2050:
+            mask = parcels.county_id == 57
+            dua.loc[mask] = dua.loc[mask] * 1.5
+    
+    elif year >=2050:
+        mask = parcels.county_id == 57
+        dua.loc[mask] = dua.loc[mask] * 1.75
 
 
     return dua
@@ -333,11 +349,15 @@ def parcel_median_price(use):
         zonesum = bframe.groupby('zone_id').agg({'residential_units':'sum'})
         tazmax = p.zone_id.max()
         zonesum = zonesum.reindex(index = range(1,tazmax+1), fill_value = 0)
-        for zone, units in zonesum.iterrows():
-            if int(units) > 20:
-                zones.append(zone)
-            else:
-                distmed.append(zone)
+        # for zone, units in zonesum.iterrows():
+        #     if int(units) > 20:
+        #         zones.append(zone)
+        #     else:
+        #         distmed.append(zone)
+        mask = zonesum.iloc[:, 0] > 20
+        zones = zonesum[mask].index.tolist()
+        distmed = zonesum[~mask].index.tolist()
+
         prz = misc.reindex(b.res_price_per_sqft[(b.zone_id.isin(zones))&(b.building_type_id.isin(btypes))&(b.res_price_per_sqft>0)&(b.res_price_per_sqft < 400)].groupby(b.zone_id).quantile(0.75), p.zone_id)
         prd = misc.reindex(b.res_price_per_sqft[(b.zone_id.isin(distmed))&(b.building_type_id.isin(btypes))&(b.res_price_per_sqft>0)&(b.res_price_per_sqft < 400)].groupby(b.distmed_id).quantile(0.75), p.distmed_id[p.zone_id.isin(distmed)])
         pr = pd.concat([prz[~np.isnan(prz)], prd[~np.isnan(prd)]])

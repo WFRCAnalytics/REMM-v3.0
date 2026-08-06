@@ -525,7 +525,7 @@ def trend_calibration(year):
 
 
 @sim.step('pipeline_projects')
-def pipeline_projects(year):
+def pipeline_projects(year, settings):
     # get buildings table
     bt = sim.get_table("buildings")
     b = bt.to_frame(bt.local_columns)
@@ -539,7 +539,8 @@ def pipeline_projects(year):
     jobs = jobst.to_frame(jobst.local_columns)
 
     # read in pipeline buildings
-    pipeline = pd.read_csv("data\pipeline_buildings_20260209.csv")
+    # pipeline = pd.read_csv("data\pipeline_buildings_20260209.csv")
+    pipeline = pd.read_csv(os.path.join(misc.data_dir(), settings['pipeline_buildings']))
     pipeline = pipeline[(pipeline.year_built == year)]
 
     # identify buildings that need to be demolished
@@ -549,15 +550,18 @@ def pipeline_projects(year):
     building_step_1 = b[np.logical_not(demolition_buildings)]
 
     # delete household tied to building?
-    delete_hh = hh.building_id.isin(b[demolition_buildings].index)
-    hh.building_id[delete_hh] = -1
+    # delete_hh = hh.building_id.isin(b[demolition_buildings].index)
+    # hh.building_id[delete_hh] = -1
+    delete_hh = hh['building_id'].isin(b[demolition_buildings].index)
+    hh.loc[delete_hh, 'building_id'] = -1
+    
 
     # delete jobs tied to building?
-    delete_jobs = jobs.building_id.isin(b[demolition_buildings].index)
-    jobs.building_id[delete_jobs] = -1
+    delete_jobs = jobs['building_id'].isin(b[demolition_buildings].index)
+    jobs.loc[delete_jobs, 'building_id'] = -1
 
     # identify buildings
-    construction = pipeline[(pipeline.DEVTYPE != "demolition")]
+    construction = pipeline[pipeline['DEVTYPE'].isin(["demolition",'demo_nodev'])==False]
     construction = construction[bt.local_columns]
 
     # recalculate index for new buildings
@@ -1101,11 +1105,11 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
         #parcels = parcels.to_frame(["county_id","zone_id"])
 
 
-        households.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "households.pkl")
-        jobs.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "jobs.pkl")
-        buildings.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "buildings.pkl")
+        households.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}households.parquet"))
+        jobs.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}jobs.parquet"))
+        buildings.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}buildings.parquet"))
         pcl = parcels.to_frame()
-        pcl.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "parcels.pkl")
+        pcl.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}parcels.parquet"))
 
         # zones0 = zones.to_frame()
         zones = pcl[["zone_id"]]
@@ -1124,12 +1128,9 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
 
         counties = buildings.groupby('county_id').agg({'residential_units':'sum','job_spaces':'sum','non_residential_sqft':'sum'})
         bnew = buildings[buildings.note == 'simulated']
-        #zones.to_pickle("E:/REMMRun/run" + str(summary.run_num) + "year" + str(year) + "zonalvariables.pkl")
-        # zones0.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "zonalvariables0.pkl")
-        zones.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "zonalvariables.pkl")
+        zones.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}zonalvariables.parquet"))
 
-        #bnew.to_pickle("E:/REMMRun/run" + str(summary.run_num) + "year" + str(year) + "newbuildings.pkl")
-        bnew.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "newbuildings.pkl")
+        bnew.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}newbuildings.parquet"))
         buildings['households'] = households.groupby("building_id").building_id.count()
 
         buildings['population'] = households.groupby("building_id").persons.sum()
@@ -1145,9 +1146,9 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
         buildings['jobs9'] = jobs[jobs.sector_id==9].groupby("building_id").building_id.count()
         buildings['jobs10'] = jobs[jobs.sector_id==10].groupby("building_id").building_id.count()
         buildings = buildings.fillna(0)
+        buildings["note"] = buildings["note"].astype(str)
 
-        #buildings.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "allbuildings.pkl")
-        buildings.to_pickle("REMMRun/run" + str(summary.run_num) + "year" + str(year) + "allbuildings.pkl")
+        buildings.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}allbuildings.parquet"))
 
         def geog_export(summary_geog, households, jobs, buildings, uphh, upj, year, run_number):
             id_col = summary_geog.index.name
@@ -1190,7 +1191,8 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
                 pop_control = pd.read_csv("./data/population_controls.csv")
                 pop_control = pop_control[pop_control.year == year]
                 summary_geog['pop_adjust'] = 0
-                summary_geog.pop_adjust[(summary_geog.households > 0) & (summary_geog.population/summary_geog.households > 1.5)]= 1
+                # summary_geog.pop_adjust[(summary_geog.households > 0) & (summary_geog.population/summary_geog.households > 1.5)]= 1
+                summary_geog.loc[(summary_geog['households'] > 0) & (summary_geog['population'] / summary_geog['households'] > 1.5), 'pop_adjust'] = 1
                 zadjust = summary_geog[summary_geog.pop_adjust == 1]
                 znoadjust = summary_geog[summary_geog.pop_adjust == 0]
                 cadjust = zadjust.groupby("COUNTY").population.sum()
@@ -1200,18 +1202,23 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
                 adjust49 = (pop_control[pop_control.cid == 49].number_of_population.iloc[0] - cnoadjust[49])/cadjust[49]
                 adjust57 = (pop_control[pop_control.cid == 57].number_of_population.iloc[0] - cnoadjust[57])/cadjust[57]
                 zafteradjust = summary_geog.copy()
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)]*adjust11
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)]*adjust35
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)]*adjust57
-                zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)]*adjust49
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 11)]*adjust11
+                zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 11), 'population'] = zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 11), 'population'] * adjust11
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 35)]*adjust35
+                zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 35), 'population'] = zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 35), 'population'] * adjust35
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 57)]*adjust57
+                zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 57), 'population'] = zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 57), 'population'] * adjust57
+                # zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)] = zafteradjust.population[(zafteradjust.pop_adjust == 1) & (zafteradjust.COUNTY == 49)]*adjust49
+                zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 49), 'population'] = zafteradjust.loc[(zafteradjust['pop_adjust'] == 1) & (zafteradjust['COUNTY'] == 49), 'population'] * adjust49
+
                 summary_geog = zafteradjust
                 #ENDADJUSTPOPULATION
 
-            file_name = "%s_indicators_%d_%d.pkl" % (id_col[:-3], run_number, year)
+            file_name = "%s_indicators_%d_%d.parquet" % (id_col[:-3], run_number, year)
             #efile = os.path.join(misc.runs_dir(), file_name)
             # efile = os.path.join("E:/REMMRun", file_name)
             efile = os.path.join("REMMRun", file_name)
-            summary_geog.to_pickle(efile)
+            summary_geog.to_parquet(efile)
 
         geog_export(zones, households, jobs, buildings, uphh, upj, year, summary.run_num)
 
@@ -1248,9 +1255,10 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
 
         # get base parcels
         base_parcels = store['parcels'].reset_index()
+        base_parcels = base_parcels.copy()
         base_parcels = base_parcels.query('x>0')
         base_parcels = base_parcels.query('zone_id>0')
-        base_parcels = base_parcels.query('zone_id<3546') #3508
+        base_parcels = base_parcels.query('zone_id<=3562') #3508
 
         # get base zoning
         base_zoning = store['zoning_baseline'].reset_index()
@@ -1304,6 +1312,7 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
 
         # summarize jobs added by type
         base_jobs = store['jobs'].reset_index()
+        base_jobs = base_jobs.copy()
         pcls = sim.get_table('parcels').to_frame(['county_id'])
         bldgs = sim.get_table('buildings').to_frame(['parcel_id'])
         bldgs = bldgs.merge(pcls, left_on='parcel_id', right_index=True, how='left')
@@ -1319,6 +1328,7 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
 
         # get household count and population
         base_households = store['households'].reset_index()
+        base_households = base_households.copy()
         base_households = base_households.merge(base_buildings[['building_id','parcel_id']])
         households_count = pd.DataFrame(base_households['parcel_id'].value_counts()).reset_index()
         households_count.columns = ['parcel_id', 'households_count']
@@ -1349,7 +1359,7 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
         parcels_output['total_value'] = parcels_output['land_value']  + (parcels_output['non_res_value'] + parcels_output['res_value'])
 
         # export the data table
-        parcels_output.to_pickle(os.path.join(directory, "run_{}_year_{}_parcel_progression_metrics_BASE.pkl".format(summary.run_num, year)))
+        parcels_output.to_parquet(os.path.join(directory, f"run_{summary.run_num}_year_{year}_parcel_progression_metrics_BASE.parquet"))
 
         # set the base year as the previous years table
         parcels_output_previous = parcels_output
@@ -1357,7 +1367,8 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
     else:
 
         # load previous year's data (we need has_buildings from previous table)
-        parcels_output_previous = pd.read_pickle(os.path.join(directory, "run_{}_year_{}_parcel_progression_metrics.pkl".format(summary.run_num, year-1)))
+        parcels_output_previous = pd.read_parquet(os.path.join(directory, f"run_{summary.run_num}_year_{year-1}_parcel_progression_metrics.parquet"))
+
 
 
     # load the data tables
@@ -1499,9 +1510,9 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
     counties_output = parcels_output.groupby('county_id')[['was_developed', 'was_redeveloped','residential_units', 'job_spaces', 'job_spaces_added', 'res_units_added', 'building_count', 'households_count', 'hhpop','households_added', 'acreage_dev', 'acreage_redev', 'total_value','value_added_dev', 'value_added_redev', 'res_units_added_dev', 'res_units_added_redev', 'acreage_dev_res', 'acreage_dev_nonres', 'acreage_redev_res', 'acreage_redev_nonres', 'value_added_dev_res', 'value_added_dev_nonres', 'jobs_accom_food_added','jobs_gov_edu_added','jobs_health_added', 'jobs_manuf_added','jobs_office_added', 'jobs_other_added', 'jobs_retail_added', 'jobs_wholesale_added' ]].sum()
 
     # export the tables
-    parcels_output.to_pickle(os.path.join(directory, "run_{}_year_{}_parcel_progression_metrics.pkl".format(summary.run_num, year)))
-    zones_output.to_pickle(os.path.join(directory, "run_{}_year_{}_zone_progression_metrics.pkl".format(summary.run_num, year)))
-    counties_output.to_pickle(os.path.join(directory, "run_{}_year_{}_county_progression_metrics.pkl".format(summary.run_num, year)))
+    parcels_output.to_parquet(os.path.join(directory, f"run_{summary.run_num}_year_{year}_parcel_progression_metrics.parquet"))
+    zones_output.to_parquet(os.path.join(directory, f"run_{summary.run_num}_year_{year}_zone_progression_metrics.parquet"))
+    counties_output.to_parquet(os.path.join(directory, f"run_{summary.run_num}_year_{year}_county_progression_metrics.parquet"))
 
 
 @sim.step('travel_model_export_no_construction')
@@ -1582,6 +1593,7 @@ def travel_model_export_no_constuction(year, settings, jobs, households, buildin
     tdm_output = tdm_output.fillna(0)
     zagj = tdm_output[(tdm_output.agr_sqft > 0)]
     c_agj_adjust = zagj.groupby("CO_FIPS").agr_sqft.sum()
+
     #first adjustment
     agj_adjust57 =  (agj[agj.cid == 57].number_of_jobs.iloc[0])*1.0/c_agj_adjust[57]
     agj_adjust11 =  (agj[agj.cid == 11].number_of_jobs.iloc[0])*1.0/c_agj_adjust[11]
@@ -2007,9 +2019,11 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
     households = pd.merge(households, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
 
     jobs = pd.merge(jobs, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
-    tdm_output = pd.read_csv("data/tdm_template_TAZ900.csv", index_col=";TAZID")
-    tdm_output['TOTHH'] = households.groupby("TAZID_900").building_id.count()
 
+    # tdm_output = pd.read_csv("data/tdm_template_TAZ900.csv", index_col=";TAZID")
+    tdm_output = pd.read_csv(os.path.join(misc.data_dir(),settings['tdm_template_v900']), index_col=";TAZID")
+
+    tdm_output['TOTHH'] = households.groupby("TAZID_900").building_id.count()
     tdm_output['HHPOP'] = households.groupby("TAZID_900").persons.sum()
     tdm_output['RETL'] = jobs[jobs.sector_id == 9].groupby("TAZID_900").building_id.count()
     tdm_output['FOOD'] = jobs[jobs.sector_id == 1].groupby("TAZID_900").building_id.count()
@@ -2035,18 +2049,34 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
                 c_pop[49] - c_hh[49])
     zafteradjust = tdm_output.copy()
     
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]) * adjust57 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]) * adjust11 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]) * adjust35 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]
-    zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] -
-                                                      zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]) * adjust49 + \
-                                                     zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]
+    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] -
+    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]) * adjust57 + \
+    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]
+
+    mask57 = zafteradjust['CO_FIPS'] == 57
+    zafteradjust.loc[mask57, 'HHPOP'] = ((zafteradjust.loc[mask57, 'HHPOP'] - zafteradjust.loc[mask57, 'TOTHH']) * adjust57  + zafteradjust.loc[mask57, 'TOTHH'])
+
+    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] -
+    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]) * adjust11 + \
+    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]
+
+    mask11 = zafteradjust['CO_FIPS'] == 11
+    zafteradjust.loc[mask11, 'HHPOP'] = ((zafteradjust.loc[mask11, 'HHPOP'] - zafteradjust.loc[mask11, 'TOTHH']) * adjust11  + zafteradjust.loc[mask11, 'TOTHH'])
+
+    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] -
+    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]) * adjust35 + \
+    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]
+    
+    mask35 = zafteradjust['CO_FIPS'] == 35
+    zafteradjust.loc[mask35, 'HHPOP'] = ((zafteradjust.loc[mask35, 'HHPOP'] - zafteradjust.loc[mask35, 'TOTHH']) * adjust35  + zafteradjust.loc[mask35, 'TOTHH'])
+
+    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] -
+    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]) * adjust49 + \
+    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]
+    mask49 = zafteradjust['CO_FIPS'] == 49
+    zafteradjust.loc[mask49, 'HHPOP'] = ((zafteradjust.loc[mask49, 'HHPOP'] - zafteradjust.loc[mask49, 'TOTHH']) * adjust49  + zafteradjust.loc[mask49, 'TOTHH'])
+
+
     tdm_output = zafteradjust.copy()
 
 
@@ -2303,7 +2333,7 @@ def travel_model_export_add_construction_TAZ900(year, settings, jobs, households
          'CO_FIPS', 'CO_NAME']]  #
     tdm_output = tdm_output.sort_values(by=[';TAZID'])
 
-    BoxElder = pd.read_csv("data/box_elderTAZ900/SE_BOX ELDER_"+str(year)+".csv")
+    BoxElder = pd.read_csv("data/box_elderTAZ1000/SE_BOX ELDER_"+str(year)+".csv")
     BoxElder = BoxElder[[';CO_TAZID', 'TOTHH', 'HHPOP', 'HHSIZE', 'TOTEMP', 'RETEMP', 'INDEMP','OTHEMP','ALLEMP','RETL', 'FOOD', 'MANU', 'WSLE', 'OFFI', 'GVED','HLTH', 'OTHR', 'FM_AGRI', 'FM_MING', 'FM_CONS', 'HBJ']]  #
     BoxElder.columns = ['CO_TAZID', 'TOTHH2', 'HHPOP2', 'HHSIZE2','TOTEMP2', 'RETEMP2', 'INDEMP2', 'OTHEMP2', 'ALLEMP2', 'RETL2','FOOD2', 'MANU2', 'WSLE2', 'OFFI2', 'GVED2', 'HLTH2', 'OTHR2', 'FM_AGRI2', 'FM_MING2', 'FM_CONS2', 'HBJ2']
     tdm_output = pd.merge(tdm_output, BoxElder, how='left', on=["CO_TAZID", "CO_TAZID"])
