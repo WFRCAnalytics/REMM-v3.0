@@ -39,7 +39,7 @@ estimation_sample_size: 15000
 prediction_sample_size: null
 
 default_config:
-    model_expression: building_age + bus_rte_dist + is_sf + np.log1p(jobs_1_500) + np.log1p(low_income_500) + parcel_volume + np.log1p(sfdu_1500)
+    model_expression: building_age + bus_rte_dist + is_sf + jobs_1_500 + low_income_500 + parcel_volume + sfdu_1500
 
 models:
     1:
@@ -48,32 +48,32 @@ models:
                 building_age: -0.1030963051507341
                 bus_rte_dist: -8.85570809717922e-06
                 is_sf: -1.6346591369491388
-                np.log1p(jobs_1_500): 0.304238238696485
-                np.log1p(low_income_500): 1.6160234626958736
+                jobs_1_500: 0.304238238696485
+                low_income_500: 1.6160234626958736
                 parcel_volume: 0.0048492007414439
-                np.log1p(sfdu_1500): -2.125124191162161                
+                sfdu_1500: -2.125124191162161                
             Std. Error:
                 building_age: -0.1030963051507341
                 bus_rte_dist: -8.85570809717922e-06
                 is_sf: -1.6346591369491388
-                np.log1p(jobs_1_500): 0.304238238696485
-                np.log1p(low_income_500): 1.6160234626958736
+                jobs_1_500: 0.304238238696485
+                low_income_500: 1.6160234626958736
                 parcel_volume: 0.0048492007414439
-                np.log1p(sfdu_1500): -2.125124191162161
+                sfdu_1500: -2.125124191162161
             T-Score:
                 building_age: -0.1030963051507341
                 bus_rte_dist: -8.85570809717922e-06
                 is_sf: -1.6346591369491388
-                np.log1p(jobs_1_500): 0.304238238696485
-                np.log1p(low_income_500): 1.6160234626958736
+                jobs_1_500: 0.304238238696485
+                low_income_500: 1.6160234626958736
                 parcel_volume: 0.0048492007414439
-                np.log1p(sfdu_1500): -2.125124191162161
+                sfdu_1500: -2.125124191162161
         fitted: true
         log_likelihoods:
             convergence: -34727.74079738298
             'null': -53684.691703476296
             ratio: 0.35311650872097256
-        model_expression: building_age + bus_rte_dist + is_sf + np.log1p(jobs_1_500) + np.log1p(low_income_500) + parcel_volume + np.log1p(sfdu_1500) -1
+        model_expression: building_age + bus_rte_dist + is_sf + jobs_1_500 + low_income_500 + parcel_volume + sfdu_1500 -1
         name: 1
     2:
         fit_parameters:
@@ -82,10 +82,10 @@ models:
                 parcel_volume: 0.004
                 building_age: -0.1
                 fwy_exit_dist_tdm_output: 0.059
-                np.log1p(low_income_500): 0.441
-                np.log1p(sfdu_1500): -1.418
-                np.log1p(jobs_1_500): 0.281
-                np.log1p(jobs_ind_1500): 0.123
+                low_income_500: 0.441
+                sfdu_1500: -1.418
+                jobs_1_500: 0.281
+                jobs_ind_1500: 0.123
                 is_sf: -1.426
                 ave_lot_size_per_unit: -0.177
                 university_dist: 0.028
@@ -95,10 +95,10 @@ models:
                 parcel_volume: 0.004
                 building_age: -0.1
                 fwy_exit_dist_tdm_output: 0.059
-                np.log1p(low_income_500): 0.441
-                np.log1p(sfdu_1500): -1.418
-                np.log1p(jobs_1_500): 0.281
-                np.log1p(jobs_ind_1500): 0.123
+                low_income_500: 0.441
+                sfdu_1500: -1.418
+                jobs_1_500: 0.281
+                jobs_ind_1500: 0.123
                 is_sf: -1.426
                 ave_lot_size_per_unit: -0.177
                 university_dist: 0.028
@@ -108,10 +108,10 @@ models:
                 parcel_volume: 0.004
                 building_age: -0.1
                 fwy_exit_dist_tdm_output: 0.059
-                np.log1p(low_income_500): 0.441
-                np.log1p(sfdu_1500): -1.418
-                np.log1p(jobs_1_500): 0.281
-                np.log1p(jobs_ind_1500): 0.123
+                low_income_500: 0.441
+                sfdu_1500: -1.418
+                jobs_1_500: 0.281
+                jobs_ind_1500: 0.123
                 is_sf: -1.426
                 ave_lot_size_per_unit: -0.177
                 university_dist: 0.028
@@ -121,7 +121,7 @@ models:
             convergence: -39021.385100968786
             'null': -52976.61553949437
             ratio: 0.263422460955851
-        model_expression: res_price_per_sqft + parcel_volume + building_age + fwy_exit_dist_tdm_output + np.log1p(low_income_500) + np.log1p(sfdu_1500) + np.log1p(jobs_1_500) + np.log1p(jobs_ind_1500) + is_sf + ave_lot_size_per_unit + university_dist + trail_dist - 1
+        model_expression: res_price_per_sqft + parcel_volume + building_age + fwy_exit_dist_tdm_output + low_income_500 + sfdu_1500 + jobs_1_500 + jobs_ind_1500 + is_sf + ave_lot_size_per_unit + university_dist + trail_dist - 1
         name: 2
     3:
         fit_parameters:
@@ -129,26 +129,26 @@ models:
                 fwy_exit_dist_tdm_output: 0.0131956930673349
                 parcel_volume: 0.0138317051322183
                 building_age: -0.0896173080487624
-                np.log1p(sfdu_1500): -3.500830823656183
-                np.log1p(high_income_1000): 4.378192897169119                
+                sfdu_1500: -3.500830823656183
+                high_income_1000: 4.378192897169119                
             Std. Error:
                 fwy_exit_dist_tdm_output: 0.0131956930673349
                 parcel_volume: 0.0138317051322183
                 building_age: -0.0896173080487624
-                np.log1p(sfdu_1500): -3.500830823656183
-                np.log1p(high_income_1000): 4.378192897169119
+                sfdu_1500: -3.500830823656183
+                high_income_1000: 4.378192897169119
             T-Score:
                 fwy_exit_dist_tdm_output: 0.0131956930673349
                 parcel_volume: 0.0138317051322183
                 building_age: -0.0896173080487624
-                np.log1p(sfdu_1500): -3.500830823656183
-                np.log1p(high_income_1000): 4.378192897169119
+                sfdu_1500: -3.500830823656183
+                high_income_1000: 4.378192897169119
         fitted: true
         log_likelihoods:
             convergence: -42846.516063325835
             'null': -53137.008482716796
             ratio: 0.1936596115066963
-        model_expression: fwy_exit_dist_tdm_output + parcel_volume + building_age + np.log1p(sfdu_1500) + np.log1p(high_income_1000) - 1
+        model_expression: fwy_exit_dist_tdm_output + parcel_volume + building_age + sfdu_1500 + high_income_1000 - 1
         name: 3
     4:
         fit_parameters:
@@ -158,7 +158,7 @@ models:
                 parcel_volume: 0.0131970743308986
                 stream_dist: -0.3905022603531566
                 university_dist: 0.0144466746313857
-                np.log1p(high_income_1000): 1.865217936802817
+                high_income_1000: 1.865217936802817
                 elevation: 0.0009440711477362
                 commute_time: -0.0069175669771116                
             Std. Error:
@@ -167,7 +167,7 @@ models:
                 parcel_volume: 0.0131970743308986
                 stream_dist: -0.3905022603531566
                 university_dist: 0.0144466746313857
-                np.log1p(high_income_1000): 1.865217936802817
+                high_income_1000: 1.865217936802817
                 elevation: 0.0009440711477362
                 commute_time: -0.0069175669771116
             T-Score:
@@ -176,7 +176,7 @@ models:
                 parcel_volume: 0.0131970743308986
                 stream_dist: -0.3905022603531566
                 university_dist: 0.0144466746313857
-                np.log1p(high_income_1000): 1.865217936802817
+                high_income_1000: 1.865217936802817
                 elevation: 0.0009440711477362
                 commute_time: -0.0069175669771116
         fitted: true
@@ -184,7 +184,7 @@ models:
             convergence: -44724.488988060264
             'null': -53602.53922036237
             ratio: 0.16562741917512636
-        model_expression: building_age + fwy_exit_dist_tdm_output + parcel_volume + stream_dist + university_dist + np.log1p(high_income_1000) + elevation + commute_time - 1
+        model_expression: building_age + fwy_exit_dist_tdm_output + parcel_volume + stream_dist + university_dist + high_income_1000 + elevation + commute_time - 1
         name: 4
 
 fitted: true

@@ -25,7 +25,7 @@ estimation_sample_size: 1000
 prediction_sample_size: null
 
 default_config:
-    model_expression: building_age + bus_rte_dist + is_industrial + is_office + np.log1p(jobs_1_500) + np.log1p(jobs_ind_1500) + np.log1p(sfdu_1500)
+    model_expression: building_age + bus_rte_dist + is_industrial + is_office + jobs_1_500 + jobs_ind_1500 + sfdu_1500
 
 models:
     1:
@@ -35,70 +35,70 @@ models:
                 bus_rte_dist: -8.144237080105715e-05
                 is_industrial: -1.7173519909260075
                 is_office: -0.6142351389447339
-                np.log1p(jobs_1_500): 3.849113064465009
-                np.log1p(jobs_ind_1500): -0.953196775036542
-                np.log1p(sfdu_1500): -0.8130108519519607                
+                jobs_1_500: 3.849113064465009
+                jobs_ind_1500: -0.953196775036542
+                sfdu_1500: -0.8130108519519607                
             Std. Error:
                 building_age: -0.0043153050618267
                 bus_rte_dist: -8.144237080105715e-05
                 is_industrial: -1.7173519909260075
                 is_office: -0.6142351389447339
-                np.log1p(jobs_1_500): 3.849113064465009
-                np.log1p(jobs_ind_1500): -0.953196775036542
-                np.log1p(sfdu_1500): -0.8130108519519607
+                jobs_1_500: 3.849113064465009
+                jobs_ind_1500: -0.953196775036542
+                sfdu_1500: -0.8130108519519607
             T-Score:
                 building_age: -0.0043153050618267
                 bus_rte_dist: -8.144237080105715e-05
                 is_industrial: -1.7173519909260075
                 is_office: -0.6142351389447339
-                np.log1p(jobs_1_500): 3.849113064465009
-                np.log1p(jobs_ind_1500): -0.953196775036542
-                np.log1p(sfdu_1500): -0.8130108519519607
+                jobs_1_500: 3.849113064465009
+                jobs_ind_1500: -0.953196775036542
+                sfdu_1500: -0.8130108519519607
         fitted: true
         log_likelihoods:
             convergence: -3012.647544320597
             'null': -3912.023005428176
             ratio: 0.2299003507544919
-        model_expression: building_age + bus_rte_dist + is_industrial + is_office + np.log1p(jobs_1_500) + np.log1p(jobs_ind_1500) + np.log1p(sfdu_1500)
+        model_expression: building_age + bus_rte_dist + is_industrial + is_office + jobs_1_500 + jobs_ind_1500 + sfdu_1500
         name: 1
     3:
         fit_parameters:
             Coefficient:
                 parcel_volume: -0.0152869139648176
-                np.log1p(jobs_200): 4.756172916263314
-                np.log1p(jobs_9_500): -0.4037638903836619
-                np.log1p(jobs_ind_1500): -0.9291469611132634
+                jobs_200: 4.756172916263314
+                jobs_9_500: -0.4037638903836619
+                jobs_ind_1500: -0.9291469611132634
                 is_retail: -0.6929352343408433
                 is_industrial: -1.5475508258501072
-                np.log1p(jobs_3_1000): 4.748188788822958
-                np.log1p(mfdu_500): -0.1901536238979832
+                jobs_3_1000: 4.748188788822958
+                mfdu_500: -0.1901536238979832
                 building_age: -0.0048308141863074                
             Std. Error:
                 parcel_volume: -0.0152869139648176
-                np.log1p(jobs_200): 4.756172916263314
-                np.log1p(jobs_9_500): -0.4037638903836619
-                np.log1p(jobs_ind_1500): -0.9291469611132634
+                jobs_200: 4.756172916263314
+                jobs_9_500: -0.4037638903836619
+                jobs_ind_1500: -0.9291469611132634
                 is_retail: -0.6929352343408433
                 is_industrial: -1.5475508258501072
-                np.log1p(jobs_3_1000): 4.748188788822958
-                np.log1p(mfdu_500): -0.1901536238979832
+                jobs_3_1000: 4.748188788822958
+                mfdu_500: -0.1901536238979832
                 building_age: -0.0048308141863074
             T-Score:
                 parcel_volume: -0.0152869139648176
-                np.log1p(jobs_200): 4.756172916263314
-                np.log1p(jobs_9_500): -0.4037638903836619
-                np.log1p(jobs_ind_1500): -0.9291469611132634
+                jobs_200: 4.756172916263314
+                jobs_9_500: -0.4037638903836619
+                jobs_ind_1500: -0.9291469611132634
                 is_retail: -0.6929352343408433
                 is_industrial: -1.5475508258501072
-                np.log1p(jobs_3_1000): 4.748188788822958
-                np.log1p(mfdu_500): -0.1901536238979832
+                jobs_3_1000: 4.748188788822958
+                mfdu_500: -0.1901536238979832
                 building_age: -0.0048308141863074
         fitted: true
         log_likelihoods:
             convergence: -2678.3859394338087
             'null': -3912.023005428176
             ratio: 0.3153450438002585
-        model_expression: parcel_volume + np.log1p(jobs_200) + np.log1p(jobs_9_500) + np.log1p(jobs_ind_1500) + is_retail + is_industrial + np.log1p(jobs_3_1000) + np.log1p(mfdu_500) + building_age
+        model_expression: parcel_volume + jobs_200 + jobs_9_500 + jobs_ind_1500 + is_retail + is_industrial + jobs_3_1000 + mfdu_500 + building_age
         name: 3
     4:
         fit_parameters:
@@ -106,10 +106,10 @@ models:
                 bus_rte_dist: -0.0001404044418842
                 is_industrial: -1.2843176596131232
                 is_retail: -0.346616490799895
-                np.log1p(jobs_4_500): 5.358994047179948
-                np.log1p(jobs_ind_1500): -0.700779687952215
-                np.log1p(mfdu_500): -0.46621592923915
-                np.log1p(jobs_9_500): -0.3592538089896051
+                jobs_4_500: 5.358994047179948
+                jobs_ind_1500: -0.700779687952215
+                mfdu_500: -0.46621592923915
+                jobs_9_500: -0.3592538089896051
                 parcel_volume: -0.0057064674219846
                 real_far: 0.0156637449398143
                 university_dist: -0.0450326320287513
@@ -119,10 +119,10 @@ models:
                 bus_rte_dist: -0.0001404044418842
                 is_industrial: -1.2843176596131232
                 is_retail: -0.346616490799895
-                np.log1p(jobs_4_500): 5.358994047179948
-                np.log1p(jobs_ind_1500): -0.700779687952215
-                np.log1p(mfdu_500): -0.46621592923915
-                np.log1p(jobs_9_500): -0.3592538089896051
+                jobs_4_500: 5.358994047179948
+                jobs_ind_1500: -0.700779687952215
+                mfdu_500: -0.46621592923915
+                jobs_9_500: -0.3592538089896051
                 parcel_volume: -0.0057064674219846
                 real_far: 0.0156637449398143
                 university_dist: -0.0450326320287513
@@ -132,10 +132,10 @@ models:
                 bus_rte_dist: -0.0001404044418842
                 is_industrial: -1.2843176596131232
                 is_retail: -0.346616490799895
-                np.log1p(jobs_4_500): 5.358994047179948
-                np.log1p(jobs_ind_1500): -0.700779687952215
-                np.log1p(mfdu_500): -0.46621592923915
-                np.log1p(jobs_9_500): -0.3592538089896051
+                jobs_4_500: 5.358994047179948
+                jobs_ind_1500: -0.700779687952215
+                mfdu_500: -0.46621592923915
+                jobs_9_500: -0.3592538089896051
                 parcel_volume: -0.0057064674219846
                 real_far: 0.0156637449398143
                 university_dist: -0.0450326320287513
@@ -146,40 +146,40 @@ models:
             convergence: -2288.82055989826
             'null': -3912.023005428176
             ratio: 0.4149266104206497
-        model_expression: bus_rte_dist + is_industrial + is_retail + np.log1p(jobs_4_500) + np.log1p(jobs_ind_1500) + np.log1p(mfdu_500) + np.log1p(jobs_9_500) + parcel_volume + real_far + university_dist + building_age + is_other
+        model_expression: bus_rte_dist + is_industrial + is_retail + jobs_4_500 + jobs_ind_1500 + mfdu_500 + jobs_9_500 + parcel_volume + real_far + university_dist + building_age + is_other
         name: 4
     5:
         fit_parameters:
             Coefficient:
                 is_industrial: 0.5602870621968201
                 is_retail: -0.8083920880047392
-                np.log1p(jobs_9_500): -0.3555262720671454
-                np.log1p(mfdu_500): -0.1633069466302967
+                jobs_9_500: -0.3555262720671454
+                mfdu_500: -0.1633069466302967
                 university_dist: 0.0305247075016596
-                np.log1p(jobs_1_500): -0.1552490022286728
-                np.log1p(jobs_5_500): 4.857350439817528                
+                jobs_1_500: -0.1552490022286728
+                jobs_5_500: 4.857350439817528                
             Std. Error:
                 is_industrial: 0.5602870621968201
                 is_retail: -0.8083920880047392
-                np.log1p(jobs_9_500): -0.3555262720671454
-                np.log1p(mfdu_500): -0.1633069466302967
+                jobs_9_500: -0.3555262720671454
+                mfdu_500: -0.1633069466302967
                 university_dist: 0.0305247075016596
-                np.log1p(jobs_1_500): -0.1552490022286728
-                np.log1p(jobs_5_500): 4.857350439817528
+                jobs_1_500: -0.1552490022286728
+                jobs_5_500: 4.857350439817528
             T-Score:
                 is_industrial: 0.5602870621968201
                 is_retail: -0.8083920880047392
-                np.log1p(jobs_9_500): -0.3555262720671454
-                np.log1p(mfdu_500): -0.1633069466302967
+                jobs_9_500: -0.3555262720671454
+                mfdu_500: -0.1633069466302967
                 university_dist: 0.0305247075016596
-                np.log1p(jobs_1_500): -0.1552490022286728
-                np.log1p(jobs_5_500): 4.857350439817528
+                jobs_1_500: -0.1552490022286728
+                jobs_5_500: 4.857350439817528
         fitted: true
         log_likelihoods:
             convergence: -2588.9482331973936
             'null': -3912.023005428176
             ratio: 0.3382073086980658
-        model_expression: is_industrial + is_retail + np.log1p(jobs_9_500) + np.log1p(mfdu_500) + university_dist + np.log1p(jobs_1_500) + np.log1p(jobs_5_500)
+        model_expression: is_industrial + is_retail + jobs_9_500 + mfdu_500 + university_dist + jobs_1_500 + jobs_5_500
         name: 5
     6:
         fit_parameters:
@@ -187,92 +187,92 @@ models:
                 is_industrial: -2.641823895739294
                 is_retail: -0.8398825152706864
                 building_age: -0.0130464934666037
-                np.log1p(sfdu_1500): -0.8350813120795093
-                np.log1p(jobs_6_500): 4.674079784507341                
+                sfdu_1500: -0.8350813120795093
+                jobs_6_500: 4.674079784507341                
             Std. Error:
                 is_industrial: -2.641823895739294
                 is_retail: -0.8398825152706864
                 building_age: -0.0130464934666037
-                np.log1p(sfdu_1500): -0.8350813120795093
-                np.log1p(jobs_6_500): 4.674079784507341
+                sfdu_1500: -0.8350813120795093
+                jobs_6_500: 4.674079784507341
             T-Score:
                 is_industrial: -2.641823895739294
                 is_retail: -0.8398825152706864
                 building_age: -0.0130464934666037
-                np.log1p(sfdu_1500): -0.8350813120795093
-                np.log1p(jobs_6_500): 4.674079784507341
+                sfdu_1500: -0.8350813120795093
+                jobs_6_500: 4.674079784507341
         fitted: true
         log_likelihoods:
             convergence: -2531.7664449105387
             'null': -3912.023005428176
             ratio: 0.3528242442854874
-        model_expression: is_industrial + is_retail + building_age + np.log1p(sfdu_1500) + np.log1p(jobs_6_500)
+        model_expression: is_industrial + is_retail + building_age + sfdu_1500 + jobs_6_500
         name: 6
     7:
         fit_parameters:
             Coefficient:
                 is_industrial: -1.2194163668578095
                 building_age: -0.0148771771698994
-                np.log1p(sfdu_1500): -0.7808995010468467
-                np.log1p(jobs_7_500): 4.910969468823294
-                np.log1p(jobs_ind_1500): -0.9183660120379092                
+                sfdu_1500: -0.7808995010468467
+                jobs_7_500: 4.910969468823294
+                jobs_ind_1500: -0.9183660120379092                
             Std. Error:
                 is_industrial: -1.2194163668578095
                 building_age: -0.0148771771698994
-                np.log1p(sfdu_1500): -0.7808995010468467
-                np.log1p(jobs_7_500): 4.910969468823294
-                np.log1p(jobs_ind_1500): -0.9183660120379092
+                sfdu_1500: -0.7808995010468467
+                jobs_7_500: 4.910969468823294
+                jobs_ind_1500: -0.9183660120379092
             T-Score:
                 is_industrial: -1.2194163668578095
                 building_age: -0.0148771771698994
-                np.log1p(sfdu_1500): -0.7808995010468467
-                np.log1p(jobs_7_500): 4.910969468823294
-                np.log1p(jobs_ind_1500): -0.9183660120379092
+                sfdu_1500: -0.7808995010468467
+                jobs_7_500: 4.910969468823294
+                jobs_ind_1500: -0.9183660120379092
         fitted: true
         log_likelihoods:
             convergence: -3310.8052462194255
             'null': -3912.023005428176
             ratio: 0.1536846174919021
-        model_expression: is_industrial + building_age + np.log1p(sfdu_1500) + np.log1p(jobs_7_500) + np.log1p(jobs_ind_1500)
+        model_expression: is_industrial + building_age + sfdu_1500 + jobs_7_500 + jobs_ind_1500
         name: 7
     9:
         fit_parameters:
             Coefficient:
                 is_industrial: -1.8327783395747963
                 is_office: -0.4455568044174643
-                np.log1p(jobs_9_500): 5.633581892043137
-                np.log1p(jobs_ind_1500): -0.5482297863855067
-                np.log1p(jobs_4_500): -0.6828595985907414
-                np.log1p(mfdu_500): -0.2702293916011113
+                jobs_9_500: 5.633581892043137
+                jobs_ind_1500: -0.5482297863855067
+                jobs_4_500: -0.6828595985907414
+                mfdu_500: -0.2702293916011113
                 building_age: -0.0087649306743666
-                np.log1p(sfdu_1500): -0.2579779529649658
+                sfdu_1500: -0.2579779529649658
                 np.log1p(logsumpopulation): 0.6891788800495132                
             Std. Error:
                 is_industrial: -1.8327783395747963
                 is_office: -0.4455568044174643
-                np.log1p(jobs_9_500): 5.633581892043137
-                np.log1p(jobs_ind_1500): -0.5482297863855067
-                np.log1p(jobs_4_500): -0.6828595985907414
-                np.log1p(mfdu_500): -0.2702293916011113
+                jobs_9_500: 5.633581892043137
+                jobs_ind_1500: -0.5482297863855067
+                jobs_4_500: -0.6828595985907414
+                mfdu_500: -0.2702293916011113
                 building_age: -0.0087649306743666
-                np.log1p(sfdu_1500): -0.2579779529649658
+                sfdu_1500: -0.2579779529649658
                 np.log1p(logsumpopulation): 0.6891788800495132
             T-Score:
                 is_industrial: -1.8327783395747963
                 is_office: -0.4455568044174643
-                np.log1p(jobs_9_500): 5.633581892043137
-                np.log1p(jobs_ind_1500): -0.5482297863855067
-                np.log1p(jobs_4_500): -0.6828595985907414
-                np.log1p(mfdu_500): -0.2702293916011113
+                jobs_9_500: 5.633581892043137
+                jobs_ind_1500: -0.5482297863855067
+                jobs_4_500: -0.6828595985907414
+                mfdu_500: -0.2702293916011113
                 building_age: -0.0087649306743666
-                np.log1p(sfdu_1500): -0.2579779529649658
+                sfdu_1500: -0.2579779529649658
                 np.log1p(logsumpopulation): 0.6891788800495132
         fitted: true
         log_likelihoods:
             convergence: -2894.521181934021
             'null': -3912.023005428176
             ratio: 0.2600960735870693
-        model_expression: is_industrial + is_office + np.log1p(jobs_9_500) + np.log1p(jobs_ind_1500) + np.log1p(jobs_4_500) + np.log1p(mfdu_500) + building_age + np.log1p(sfdu_1500) + np.log1p(logsumpopulation)
+        model_expression: is_industrial + is_office + jobs_9_500 + jobs_ind_1500 + jobs_4_500 + mfdu_500 + building_age + sfdu_1500 + np.log1p(logsumpopulation)
         name: 9
     10:
         fit_parameters:
@@ -280,35 +280,35 @@ models:
                 is_retail: -1.6249196320410184
                 is_office: -0.4028883115913119
                 fwy_exit_dist_tdm_output: 0.3208911722657188
-                np.log1p(jobs_1_500): -0.26666716788607
-                np.log1p(jobs_9_500): -0.2415883981280597
+                jobs_1_500: -0.26666716788607
+                jobs_9_500: -0.2415883981280597
                 building_age: -0.0081415352133332
-                np.log1p(jobs_10_500): 5.228091583688883
+                jobs_10_500: 5.228091583688883
                 np.log1p(population_within_10_min): -0.0467179791678009                
             Std. Error:
                 is_retail: -1.6249196320410184
                 is_office: -0.4028883115913119
                 fwy_exit_dist_tdm_output: 0.3208911722657188
-                np.log1p(jobs_1_500): -0.26666716788607
-                np.log1p(jobs_9_500): -0.2415883981280597
+                jobs_1_500: -0.26666716788607
+                jobs_9_500: -0.2415883981280597
                 building_age: -0.0081415352133332
-                np.log1p(jobs_10_500): 5.228091583688883
+                jobs_10_500: 5.228091583688883
                 np.log1p(population_within_10_min): -0.0467179791678009
             T-Score:
                 is_retail: -1.6249196320410184
                 is_office: -0.4028883115913119
                 fwy_exit_dist_tdm_output: 0.3208911722657188
-                np.log1p(jobs_1_500): -0.26666716788607
-                np.log1p(jobs_9_500): -0.2415883981280597
+                jobs_1_500: -0.26666716788607
+                jobs_9_500: -0.2415883981280597
                 building_age: -0.0081415352133332
-                np.log1p(jobs_10_500): 5.228091583688883
+                jobs_10_500: 5.228091583688883
                 np.log1p(population_within_10_min): -0.0467179791678009
         fitted: true
         log_likelihoods:
             convergence: -2358.6188453380664
             'null': -3888.550867395607
             ratio: 0.3934452895770466
-        model_expression: is_retail + is_office + fwy_exit_dist_tdm_output + np.log1p(jobs_1_500) + np.log1p(jobs_9_500) + building_age + np.log1p(jobs_10_500) + np.log1p(population_within_10_min)
+        model_expression: is_retail + is_office + fwy_exit_dist_tdm_output + jobs_1_500 + jobs_9_500 + building_age + jobs_10_500 + np.log1p(population_within_10_min)
         name: 10
 
 fitted: true

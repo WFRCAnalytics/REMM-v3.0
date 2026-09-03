@@ -25,27 +25,27 @@ estimation_sample_size: 1000
 prediction_sample_size: null
 
 default_config:
-    model_expression: np.log1p(jobs_1_500) + unit_price_non_residential + np.log1p(jobs_ind_1500) + is_office + is_industrial
+    model_expression: jobs_1_500 + unit_price_non_residential + jobs_ind_1500 + is_office + is_industrial
 
 models:
     1:
         fit_parameters:
             Coefficient:
-                np.log1p(jobs_1_500): 3.073596686999923
+                jobs_1_500: 3.073596686999923
                 unit_price_non_residential: 0.0179738983261254
-                np.log1p(jobs_ind_1500): -0.9204211814799332
+                jobs_ind_1500: -0.9204211814799332
                 is_office: -0.551384461730445
                 is_industrial: -2.311348756703174                
             Std. Error:
-                np.log1p(jobs_1_500): 3.073596686999923
+                jobs_1_500: 3.073596686999923
                 unit_price_non_residential: 0.0179738983261254
-                np.log1p(jobs_ind_1500): -0.9204211814799332
+                jobs_ind_1500: -0.9204211814799332
                 is_office: -0.551384461730445
                 is_industrial: -2.311348756703174 
             T-Score:
-                np.log1p(jobs_1_500): 3.073596686999923
+                jobs_1_500: 3.073596686999923
                 unit_price_non_residential: 0.0179738983261254
-                np.log1p(jobs_ind_1500): -0.9204211814799332
+                jobs_ind_1500: -0.9204211814799332
                 is_office: -0.551384461730445
                 is_industrial: -2.311348756703174 
         fitted: true
@@ -53,38 +53,38 @@ models:
             convergence: -2961.189978998089
             'null': -3912.023005428176
             ratio: 0.2430540477678037
-        model_expression: np.log1p(jobs_1_500) + unit_price_non_residential + np.log1p(jobs_ind_1500) + is_office + is_industrial
+        model_expression: jobs_1_500 + unit_price_non_residential + jobs_ind_1500 + is_office + is_industrial
         name: 1
     3:
         fit_parameters:
             Coefficient:               
                 parcel_volume: -0.0185764270773735
-                np.log1p(jobs_200): 5.0990241645855
+                jobs_200: 5.0990241645855
                 real_far: -0.0450989357270582
                 fwy_exit_dist_tdm_output: 0.2361984576127103
                 np.log1p(jobs_3_within_10_min): 0.4994798214013641
-                np.log1p(jobs_ind_1500): -0.3259514844773715
-                np.log1p(sfdu_1500): -0.727581329203023
+                jobs_ind_1500: -0.3259514844773715
+                sfdu_1500: -0.727581329203023
                 unit_price_non_residential: -0.0810583047704935
                 is_industrial: -2.5419846042340883                
             Std. Error:
                 parcel_volume: -0.0185764270773735
-                np.log1p(jobs_200): 5.0990241645855
+                jobs_200: 5.0990241645855
                 real_far: -0.0450989357270582
                 fwy_exit_dist_tdm_output: 0.2361984576127103
                 np.log1p(jobs_3_within_10_min): 0.4994798214013641
-                np.log1p(jobs_ind_1500): -0.3259514844773715
-                np.log1p(sfdu_1500): -0.727581329203023
+                jobs_ind_1500: -0.3259514844773715
+                sfdu_1500: -0.727581329203023
                 unit_price_non_residential: -0.0810583047704935
                 is_industrial: -2.5419846042340883
             T-Score:
                 parcel_volume: -0.0185764270773735
-                np.log1p(jobs_200): 5.0990241645855
+                jobs_200: 5.0990241645855
                 real_far: -0.0450989357270582
                 fwy_exit_dist_tdm_output: 0.2361984576127103
                 np.log1p(jobs_3_within_10_min): 0.4994798214013641
-                np.log1p(jobs_ind_1500): -0.3259514844773715
-                np.log1p(sfdu_1500): -0.727581329203023
+                jobs_ind_1500: -0.3259514844773715
+                sfdu_1500: -0.727581329203023
                 unit_price_non_residential: -0.0810583047704935
                 is_industrial: -2.5419846042340883
         fitted: true
@@ -92,29 +92,29 @@ models:
             convergence: -1387.8418250266752
             'null': -3912.023005428176
             ratio: 0.6452367935717765
-        model_expression: parcel_volume + np.log1p(jobs_200) + real_far + fwy_exit_dist_tdm_output + np.log1p(jobs_3_within_10_min) + np.log1p(jobs_ind_1500) + np.log1p(sfdu_1500) + unit_price_non_residential + is_industrial
+        model_expression: parcel_volume + jobs_200 + real_far + fwy_exit_dist_tdm_output + np.log1p(jobs_3_within_10_min) + jobs_ind_1500 + sfdu_1500 + unit_price_non_residential + is_industrial
         name: 3
     4:
         fit_parameters:
             Coefficient:
                 is_retail: -0.7615386234612226
-                np.log1p(jobs_ind_1500): -0.6917611639325262
+                jobs_ind_1500: -0.6917611639325262
                 is_industrial: -1.9078832376722683
-                np.log1p(jobs_4_500): 3.189251782222657
+                jobs_4_500: 3.189251782222657
                 commute_time: -0.0292714155953174
                 is_other: 0.3605439670145618                
             Std. Error:
                 is_retail: -0.7615386234612226
-                np.log1p(jobs_ind_1500): -0.6917611639325262
+                jobs_ind_1500: -0.6917611639325262
                 is_industrial: -1.9078832376722683
-                np.log1p(jobs_4_500): 3.189251782222657
+                jobs_4_500: 3.189251782222657
                 commute_time: -0.0292714155953174
                 is_other: 0.3605439670145618
             T-Score:
                 is_retail: -0.7615386234612226
-                np.log1p(jobs_ind_1500): -0.6917611639325262
+                jobs_ind_1500: -0.6917611639325262
                 is_industrial: -1.9078832376722683
-                np.log1p(jobs_4_500): 3.189251782222657
+                jobs_4_500: 3.189251782222657
                 commute_time: -0.0292714155953174
                 is_other: 0.3605439670145618
         fitted: true
@@ -122,7 +122,7 @@ models:
             convergence: -2859.3513400802403
             'null': -3912.023005428176
             ratio: 0.2690862665907864
-        model_expression: is_retail + np.log1p(jobs_ind_1500) + is_industrial + np.log1p(jobs_4_500) + commute_time + is_other
+        model_expression: is_retail + jobs_ind_1500 + is_industrial + jobs_4_500 + commute_time + is_other
         name: 4
     5:
         fit_parameters:
@@ -131,58 +131,58 @@ models:
                 is_office: -1.2603337545062872
                 fwy_exit_dist_tdm_output: 0.389909173435592
                 rail_depot: 1.2538499682615991
-                np.log1p(jobs_1_500): -0.3569138479714168
-                np.log1p(jobs_5_500): 4.19506602536452                
+                jobs_1_500: -0.3569138479714168
+                jobs_5_500: 4.19506602536452                
             Std. Error:
                 is_retail: -0.5820297383614849
                 is_office: -1.2603337545062872
                 fwy_exit_dist_tdm_output: 0.389909173435592
                 rail_depot: 1.2538499682615991
-                np.log1p(jobs_1_500): -0.3569138479714168
-                np.log1p(jobs_5_500): 4.19506602536452
+                jobs_1_500: -0.3569138479714168
+                jobs_5_500: 4.19506602536452
             T-Score:
                 is_retail: -0.5820297383614849
                 is_office: -1.2603337545062872
                 fwy_exit_dist_tdm_output: 0.389909173435592
                 rail_depot: 1.2538499682615991
-                np.log1p(jobs_1_500): -0.3569138479714168
-                np.log1p(jobs_5_500): 4.19506602536452
+                jobs_1_500: -0.3569138479714168
+                jobs_5_500: 4.19506602536452
         fitted: true
         log_likelihoods:
             convergence: -3676.497285650875
             'null': -3912.023005428176
             ratio: 0.06020560703515665
-        model_expression: is_retail + is_office + fwy_exit_dist_tdm_output + rail_depot + np.log1p(jobs_1_500) + np.log1p(jobs_5_500)
+        model_expression: is_retail + is_office + fwy_exit_dist_tdm_output + rail_depot + jobs_1_500 + jobs_5_500
         name: 5
     6:
         fit_parameters:
             Coefficient:
                 commute_time: -0.0602325126453846
                 population_within_30_min_transit: -2.338844238306336e-05
-                np.log1p(jobs_1_500): -0.8841254827039828
+                jobs_1_500: -0.8841254827039828
                 is_retail: -0.6184112711400901
                 is_industrial: -2.752734409440878
-                np.log1p(jobs_6_500): 4.575260610738653                
+                jobs_6_500: 4.575260610738653                
             Std. Error:
                 commute_time: -0.0602325126453846
                 population_within_30_min_transit: -2.338844238306336e-05
-                np.log1p(jobs_1_500): -0.8841254827039828
+                jobs_1_500: -0.8841254827039828
                 is_retail: -0.6184112711400901
                 is_industrial: -2.752734409440878
-                np.log1p(jobs_6_500): 4.575260610738653
+                jobs_6_500: 4.575260610738653
             T-Score:
                 commute_time: -0.0602325126453846
                 population_within_30_min_transit: -2.338844238306336e-05
-                np.log1p(jobs_1_500): -0.8841254827039828
+                jobs_1_500: -0.8841254827039828
                 is_retail: -0.6184112711400901
                 is_industrial: -2.752734409440878
-                np.log1p(jobs_6_500): 4.575260610738653
+                jobs_6_500: 4.575260610738653
         fitted: true
         log_likelihoods:
             convergence: -2322.09109090014
             'null': -3912.023005428176
             ratio: 0.40642192347077366
-        model_expression: commute_time + population_within_30_min_transit + np.log1p(jobs_1_500) + is_retail + is_industrial + np.log1p(jobs_6_500)
+        model_expression: commute_time + population_within_30_min_transit + jobs_1_500 + is_retail + is_industrial + jobs_6_500
         name: 6
     7:
         fit_parameters:
@@ -192,27 +192,27 @@ models:
                 np.log1p(jobs_5_within_10_min): -0.183685516542272
                 rail_depot: 0.4032439179134349
                 is_office: -1.0602741129513058
-                np.log1p(jobs_7_500): 4.949937049817691                
+                jobs_7_500: 4.949937049817691                
             Std. Error:
                 is_industrial: -1.870601852867224
                 is_retail: -0.872337362433186
                 np.log1p(jobs_5_within_10_min): -0.183685516542272
                 rail_depot: 0.4032439179134349
                 is_office: -1.0602741129513058
-                np.log1p(jobs_7_500): 4.949937049817691
+                jobs_7_500: 4.949937049817691
             T-Score:
                 is_industrial: -1.870601852867224
                 is_retail: -0.872337362433186
                 np.log1p(jobs_5_within_10_min): -0.183685516542272
                 rail_depot: 0.4032439179134349
                 is_office: -1.0602741129513058
-                np.log1p(jobs_7_500): 4.949937049817691
+                jobs_7_500: 4.949937049817691
         fitted: true
         log_likelihoods:
             convergence: -3319.010093736186
             'null': -3912.023005428176
             ratio: 0.15158727616610324
-        model_expression: is_industrial + is_retail + np.log1p(jobs_5_within_10_min) + rail_depot + is_office + np.log1p(jobs_7_500)
+        model_expression: is_industrial + is_retail + np.log1p(jobs_5_within_10_min) + rail_depot + is_office + jobs_7_500
         name: 7
     9:
         fit_parameters:
@@ -220,56 +220,56 @@ models:
                 is_industrial: -1.7907073766528765
                 is_office: -0.5011396509387395
                 fwy_exit_dist_tdm_output: 0.322637438146157
-                np.log1p(jobs_9_500): 5.207702003949595
-                np.log1p(mfdu_500): -0.344814979417146                
+                jobs_9_500: 5.207702003949595
+                mfdu_500: -0.344814979417146                
             Std. Error:
                 is_industrial: -1.7907073766528765
                 is_office: -0.5011396509387395
                 fwy_exit_dist_tdm_output: 0.322637438146157
-                np.log1p(jobs_9_500): 5.207702003949595
-                np.log1p(mfdu_500): -0.344814979417146
+                jobs_9_500: 5.207702003949595
+                mfdu_500: -0.344814979417146
             T-Score:
                 is_industrial: -1.7907073766528765
                 is_office: -0.5011396509387395
                 fwy_exit_dist_tdm_output: 0.322637438146157
-                np.log1p(jobs_9_500): 5.207702003949595
-                np.log1p(mfdu_500): -0.344814979417146
+                jobs_9_500: 5.207702003949595
+                mfdu_500: -0.344814979417146
         fitted: true
         log_likelihoods:
             convergence: -2839.5282936989506
             'null': -3912.023005428176
             ratio: 0.2741534776868827
-        model_expression: is_industrial + is_office + fwy_exit_dist_tdm_output + np.log1p(jobs_9_500) + np.log1p(mfdu_500)
+        model_expression: is_industrial + is_office + fwy_exit_dist_tdm_output + jobs_9_500 + mfdu_500
         name: 9
     10:
         fit_parameters:
             Coefficient:
                 is_office: -1.3384253680834344
                 commute_time: 0.0559096068292915
-                np.log1p(jobs_1_500): -0.3208707728703501
+                jobs_1_500: -0.3208707728703501
                 is_retail: -0.5412713370561327
                 rail_depot: 0.3484953725022637
-                np.log1p(jobs_10_500): 4.056802953479554                
+                jobs_10_500: 4.056802953479554                
             Std. Error:
                 is_office: -1.3384253680834344
                 commute_time: 0.0559096068292915
-                np.log1p(jobs_1_500): -0.3208707728703501
+                jobs_1_500: -0.3208707728703501
                 is_retail: -0.5412713370561327
                 rail_depot: 0.3484953725022637
-                np.log1p(jobs_10_500): 4.056802953479554
+                jobs_10_500: 4.056802953479554
             T-Score:
                 is_office: -1.3384253680834344
                 commute_time: 0.0559096068292915
-                np.log1p(jobs_1_500): -0.3208707728703501
+                jobs_1_500: -0.3208707728703501
                 is_retail: -0.5412713370561327
                 rail_depot: 0.3484953725022637
-                np.log1p(jobs_10_500): 4.056802953479554
+                jobs_10_500: 4.056802953479554
         fitted: true
         log_likelihoods:
             convergence: -2639.995231665923
             'null': -3912.023005428176
             ratio: 0.3251585616948661
-        model_expression: is_office + commute_time + np.log1p(jobs_1_500) + is_retail + rail_depot + np.log1p(jobs_10_500)
+        model_expression: is_office + commute_time + jobs_1_500 + is_retail + rail_depot + jobs_10_500
         name: 10
 
 fitted: true

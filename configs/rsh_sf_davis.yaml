@@ -26,7 +26,7 @@ predict_filters:
 min_segment_size: 10
 
 default_config:
-    model_expression: sqft_per_unit + fwy_exit_dist_tdm_output + parcel_volume + airport_distance + trail_dist + np.log1p(jobs_5_500) + np.log1p(jobs_10_within_10_min) + np.log1p(population_within_10_min)
+    model_expression: sqft_per_unit + fwy_exit_dist_tdm_output + parcel_volume + airport_distance + trail_dist + jobs_5_500 + np.log1p(jobs_10_within_10_min) + np.log1p(population_within_10_min)
 
     ytransform: null
 
@@ -40,7 +40,7 @@ models:
                 parcel_volume: -0.001463617516179
                 airport_distance: 0.019618155361188
                 trail_dist: -0.013439789773871
-                np.log1p(jobs_5_500): 0.021573903201761
+                jobs_5_500: 0.021573903201761
                 np.log1p(jobs_10_within_10_min): 0.033290394683206
                 np.log1p(population_within_10_min): -0.080051094918364
             Std. Error:
@@ -50,7 +50,7 @@ models:
                 parcel_volume: -0.001463617516179
                 airport_distance: 0.019618155361188
                 trail_dist: -0.013439789773871
-                np.log1p(jobs_5_500): 0.021573903201761
+                jobs_5_500: 0.021573903201761
                 np.log1p(jobs_10_within_10_min): 0.033290394683206
                 np.log1p(population_within_10_min): -0.080051094918364
             T-Score:
@@ -60,7 +60,7 @@ models:
                 parcel_volume: -0.001463617516179
                 airport_distance: 0.019618155361188
                 trail_dist: -0.013439789773871
-                np.log1p(jobs_5_500): 0.021573903201761
+                jobs_5_500: 0.021573903201761
                 np.log1p(jobs_10_within_10_min): 0.033290394683206
                 np.log1p(population_within_10_min): -0.080051094918364
         fit_rsquared: 0.46249165473221565

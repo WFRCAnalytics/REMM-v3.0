@@ -37,7 +37,7 @@ estimation_sample_size: 15000
 prediction_sample_size: null
 
 default_config:
-    model_expression: commute_time + parcel_volume + np.log1p(mfdu_500) + is_mf + building_age + real_far + trail_dist + logsum_hhinc1 + sqft_per_unit
+    model_expression: commute_time + parcel_volume + mfdu_500 + is_mf + building_age + real_far + trail_dist + logsum_hhinc1 + sqft_per_unit
 
 models:
     1:
@@ -45,7 +45,7 @@ models:
             Coefficient:
                 commute_time: -0.0462126076742316
                 parcel_volume: 0.0036977660840623
-                np.log1p(mfdu_500): 0.5357306988970842
+                mfdu_500: 0.5357306988970842
                 is_mf: 1.857240186750032
                 building_age: -0.0095633280380266
                 real_far: 0.2022989800545547
@@ -55,7 +55,7 @@ models:
             Std. Error:
                 commute_time: -0.0462126076742316
                 parcel_volume: 0.0036977660840623
-                np.log1p(mfdu_500): 0.5357306988970842
+                mfdu_500: 0.5357306988970842
                 is_mf: 1.857240186750032
                 building_age: -0.0095633280380266
                 real_far: 0.2022989800545547
@@ -65,7 +65,7 @@ models:
             T-Score:
                 commute_time: -0.0462126076742316
                 parcel_volume: 0.0036977660840623
-                np.log1p(mfdu_500): 0.5357306988970842
+                mfdu_500: 0.5357306988970842
                 is_mf: 1.857240186750032
                 building_age: -0.0095633280380266
                 real_far: 0.2022989800545547
@@ -77,7 +77,7 @@ models:
             convergence: -50063.24147891323
             'null': -58680.34508140402
             ratio: 0.1468482094053256
-        model_expression: commute_time + parcel_volume + np.log1p(mfdu_500) + is_mf + building_age + real_far + trail_dist + logsum_hhinc1 + sqft_per_unit - 1
+        model_expression: commute_time + parcel_volume + mfdu_500 + is_mf + building_age + real_far + trail_dist + logsum_hhinc1 + sqft_per_unit - 1
         name: 1
     2:
         fit_parameters:
@@ -85,24 +85,24 @@ models:
                 ave_sqft_per_unit_500: -0.228608755184303
                 elevation: -0.0008328692965443
                 is_sf: -1.9659430287613588
-                np.log1p(mfdu_500): 0.4095223634309025
-                np.log1p(jobs_ind_1500): 0.0746037055162374
+                mfdu_500: 0.4095223634309025
+                jobs_ind_1500: 0.0746037055162374
                 building_age: -0.0113778525760883
                 trail_dist: -0.043527923945121                
             Std. Error:
                 ave_sqft_per_unit_500: -0.228608755184303
                 elevation: -0.0008328692965443
                 is_sf: -1.9659430287613588
-                np.log1p(mfdu_500): 0.4095223634309025
-                np.log1p(jobs_ind_1500): 0.0746037055162374
+                mfdu_500: 0.4095223634309025
+                jobs_ind_1500: 0.0746037055162374
                 building_age: -0.0113778525760883
                 trail_dist: -0.043527923945121
             T-Score:
                 ave_sqft_per_unit_500: -0.228608755184303
                 elevation: -0.0008328692965443
                 is_sf: -1.9659430287613588
-                np.log1p(mfdu_500): 0.4095223634309025
-                np.log1p(jobs_ind_1500): 0.0746037055162374
+                mfdu_500: 0.4095223634309025
+                jobs_ind_1500: 0.0746037055162374
                 building_age: -0.0113778525760883
                 trail_dist: -0.043527923945121
         fitted: true
@@ -110,7 +110,7 @@ models:
             convergence: -52366.78977490533
             'null': -58680.34508140402
             ratio: 0.10759233432830428
-        model_expression: ave_sqft_per_unit_500 + elevation + is_sf + np.log1p(mfdu_500) + np.log1p(jobs_ind_1500) + building_age + trail_dist - 1
+        model_expression: ave_sqft_per_unit_500 + elevation + is_sf + mfdu_500 + jobs_ind_1500 + building_age + trail_dist - 1
         name: 2
     3:
         fit_parameters:
@@ -153,7 +153,7 @@ models:
                 trail_dist: -0.0608749416622108
                 fwy_exit_dist_tdm_output: -0.0380898042228051
                 elevation: 0.001108195509243
-                np.log1p(sfdu_1500): -2.309164719420568
+                sfdu_1500: -2.309164719420568
                 commute_time: -0.0049037164324778                
             Std. Error:
                 building_age: -0.0069685863009211
@@ -161,7 +161,7 @@ models:
                 trail_dist: -0.0608749416622108
                 fwy_exit_dist_tdm_output: -0.0380898042228051
                 elevation: 0.001108195509243
-                np.log1p(sfdu_1500): -2.309164719420568
+                sfdu_1500: -2.309164719420568
                 commute_time: -0.0049037164324778
             T-Score:
                 building_age: -0.0069685863009211
@@ -169,14 +169,14 @@ models:
                 trail_dist: -0.0608749416622108
                 fwy_exit_dist_tdm_output: -0.0380898042228051
                 elevation: 0.001108195509243
-                np.log1p(sfdu_1500): -2.309164719420568
+                sfdu_1500: -2.309164719420568
                 commute_time: -0.0049037164324778
         fitted: true
         log_likelihoods:
             convergence: -50800.75699219788
             'null': -52112.058455295446
             ratio: 0.02516311007408145
-        model_expression: building_age + stream_dist + trail_dist + fwy_exit_dist_tdm_output + elevation + np.log1p(sfdu_1500) + commute_time - 1
+        model_expression: building_age + stream_dist + trail_dist + fwy_exit_dist_tdm_output + elevation + sfdu_1500 + commute_time - 1
         name: 4
 
 fitted: true

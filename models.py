@@ -345,6 +345,7 @@ def elcm_simulate_davis(jobs, buildings, aggregations):
 
 @sim.step('elcm_simulate_weber')
 def elcm_simulate_weber(jobs, buildings, aggregations):
+    
     return wfrc_utils.lcm_simulate("elcm_weber.yaml", jobs, buildings, aggregations,
                               "building_id", "job_spaces",
                               "vacant_job_spaces")
@@ -1076,7 +1077,7 @@ def non_residential_developer(feasibility, jobs_weber, buildings_weber, building
     summary.add_parcel_output(new_buildings)
 
 @sim.step("indicator_export")
-def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, distsml, year, summary, run_number, settings):
+def indicator_export(nodes, aggregations, households, buildings, jobs, parcels, distlrg, distmed, distsml, year, summary, run_number, settings):
 
     # if year in [2015,2020,2030,2040,2050]:
     if year in settings['remm']['indicator_years']:
@@ -1086,9 +1087,12 @@ def indicator_export(households, buildings, jobs, parcels, distlrg, distmed, dis
             os.makedirs('REMMRun')
 
         households = households.to_frame()
-
         buildings = buildings.to_frame()
+        nodes = nodes.to_frame()
+        nodes.to_parquet(os.path.join("REMMRun", f"run{summary.run_num}year{year}nodes.parquet"))
+        print("AGGREGATIONS!!!!!!!",aggregations)
 
+    
 
         b1 = buildings[buildings.building_type_id==1]
         b2 = buildings[buildings.building_type_id==2]
@@ -1394,7 +1398,7 @@ def progression_metrics_export(year, settings, store, summary, jobs, households,
     parcels['has_buildings'] = parcels_output_previous['has_buildings']
 
     # identify new buildings and indicate whether development or redevelopment has occurred
-    new_buildings = buildings[(buildings['note'].isin(['simulated', 'pipeline']) == True) & (buildings['year_built'] == year)]
+    new_buildings = buildings[(buildings['note'].isin(['base']) == False) & (buildings['year_built'] == year)]
     ids = list(set(new_buildings ["parcel_id"].to_list()))
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==0)), 'was_developed'] = 1
     parcels.loc[((parcels['parcel_id'].isin(ids)) & (parcels['has_buildings']==1)), 'was_redeveloped'] = 1
@@ -2014,16 +2018,19 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
     jobs = jobs.to_frame()
     parcels = parcels.to_frame()
     parcels = parcels.reset_index()
+
     parcels['parcel_id_REMM'] = parcels['parcel_id']
     parcelsTAZ900 = parcels[['parcel_id_REMM','TAZID_900']]
+
     households = pd.merge(households, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
 
     jobs = pd.merge(jobs, parcelsTAZ900, left_on='parcel_id', right_on='parcel_id_REMM')
 
     # tdm_output = pd.read_csv("data/tdm_template_TAZ900.csv", index_col=";TAZID")
-    tdm_output = pd.read_csv(os.path.join(misc.data_dir(),settings['tdm_template_v900']), index_col=";TAZID")
+    tdm_output = pd.read_csv(os.path.join(misc.data_dir(), settings['tdm_template_v900']), index_col=";TAZID")
 
     tdm_output['TOTHH'] = households.groupby("TAZID_900").building_id.count()
+
     tdm_output['HHPOP'] = households.groupby("TAZID_900").persons.sum()
     tdm_output['RETL'] = jobs[jobs.sector_id == 9].groupby("TAZID_900").building_id.count()
     tdm_output['FOOD'] = jobs[jobs.sector_id == 1].groupby("TAZID_900").building_id.count()
@@ -2049,32 +2056,18 @@ def travel_model_export_no_construction_TAZ900(year, settings, jobs, households,
                 c_pop[49] - c_hh[49])
     zafteradjust = tdm_output.copy()
     
-    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 57] -
-    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]) * adjust57 + \
-    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 57]
-
     mask57 = zafteradjust['CO_FIPS'] == 57
     zafteradjust.loc[mask57, 'HHPOP'] = ((zafteradjust.loc[mask57, 'HHPOP'] - zafteradjust.loc[mask57, 'TOTHH']) * adjust57  + zafteradjust.loc[mask57, 'TOTHH'])
-
-    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 11] -
-    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]) * adjust11 + \
-    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 11]
 
     mask11 = zafteradjust['CO_FIPS'] == 11
     zafteradjust.loc[mask11, 'HHPOP'] = ((zafteradjust.loc[mask11, 'HHPOP'] - zafteradjust.loc[mask11, 'TOTHH']) * adjust11  + zafteradjust.loc[mask11, 'TOTHH'])
 
-    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 35] -
-    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]) * adjust35 + \
-    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 35]
-    
     mask35 = zafteradjust['CO_FIPS'] == 35
     zafteradjust.loc[mask35, 'HHPOP'] = ((zafteradjust.loc[mask35, 'HHPOP'] - zafteradjust.loc[mask35, 'TOTHH']) * adjust35  + zafteradjust.loc[mask35, 'TOTHH'])
 
-    # zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] = (zafteradjust.HHPOP[zafteradjust.CO_FIPS == 49] -
-    #                                                   zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]) * adjust49 + \
-    #                                                  zafteradjust.TOTHH[zafteradjust.CO_FIPS == 49]
     mask49 = zafteradjust['CO_FIPS'] == 49
     zafteradjust.loc[mask49, 'HHPOP'] = ((zafteradjust.loc[mask49, 'HHPOP'] - zafteradjust.loc[mask49, 'TOTHH']) * adjust49  + zafteradjust.loc[mask49, 'TOTHH'])
+
 
 
     tdm_output = zafteradjust.copy()

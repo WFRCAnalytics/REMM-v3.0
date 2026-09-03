@@ -24,7 +24,7 @@ predict_filters:
 min_segment_size: 10
 
 default_config:
-    model_expression: rail_depot + rail_stn_dist + parcel_volume + university_dist + ave_sqft_per_unit_500 + population_within_30_min_transit + np.log1p(jobs_500) + np.log1p(mfdu_1000)
+    model_expression: rail_depot + rail_stn_dist + parcel_volume + university_dist + ave_sqft_per_unit_500 + population_within_30_min_transit + jobs_500 + mfdu_1000
 
     ytransform: null
 
@@ -39,8 +39,8 @@ models:
                 university_dist: 0.038840995522064
                 ave_sqft_per_unit_500: -0.012821989470099
                 population_within_30_min_transit: -0.000012826210591
-                np.log1p(jobs_500): -0.282166253144905
-                np.log1p(mfdu_1000): 0.049929108768175
+                jobs_500: -0.282166253144905
+                mfdu_1000: 0.049929108768175
             Std. Error:
                 Intercept: 2.231640710227948
                 rail_depot: -0.190869539556835
@@ -49,8 +49,8 @@ models:
                 university_dist: 0.038840995522064
                 ave_sqft_per_unit_500: -0.012821989470099
                 population_within_30_min_transit: -0.000012826210591
-                np.log1p(jobs_500): -0.282166253144905
-                np.log1p(mfdu_1000): 0.049929108768175
+                jobs_500: -0.282166253144905
+                mfdu_1000: 0.049929108768175
             T-Score:
                 Intercept: 2.231640710227948
                 rail_depot: -0.190869539556835
@@ -59,8 +59,8 @@ models:
                 university_dist: 0.038840995522064
                 ave_sqft_per_unit_500: -0.012821989470099
                 population_within_30_min_transit: -0.000012826210591
-                np.log1p(jobs_500): -0.282166253144905
-                np.log1p(mfdu_1000): 0.049929108768175
+                jobs_500: -0.282166253144905
+                mfdu_1000: 0.049929108768175
         fit_rsquared: 0.433
         fit_rsquared_adj: 0.403
         fitted: true

@@ -24,7 +24,7 @@ predict_filters:
 min_segment_size: 10
 
 default_config:
-    model_expression: parcel_volume + university_dist + rail_depot + np.log1p(jobs_6_1000) + np.log1p(industrial_sqft_1000)
+    model_expression: parcel_volume + university_dist + rail_depot + jobs_6_1000 + np.log1p(industrial_sqft_1000)
 
     ytransform: null
 
@@ -36,21 +36,21 @@ models:
                 parcel_volume: 0.002718326438732
                 university_dist: 0.011587562860226
                 rail_depot: -0.064372334826557
-                np.log1p(jobs_6_1000): 0.078243810875863
+                jobs_6_1000: 0.078243810875863
                 np.log1p(industrial_sqft_1000): -0.058167604482515
             Std. Error:
                 Intercept: 2.622261358151220
                 parcel_volume: 0.002718326438732
                 university_dist: 0.011587562860226
                 rail_depot: -0.064372334826557
-                np.log1p(jobs_6_1000): 0.078243810875863
+                jobs_6_1000: 0.078243810875863
                 np.log1p(industrial_sqft_1000): -0.058167604482515
             T-Score:
                 Intercept: 2.622261358151220
                 parcel_volume: 0.002718326438732
                 university_dist: 0.011587562860226
                 rail_depot: -0.064372334826557
-                np.log1p(jobs_6_1000): 0.078243810875863
+                jobs_6_1000: 0.078243810875863
                 np.log1p(industrial_sqft_1000): -0.058167604482515
         fit_rsquared: 0.210
         fit_rsquared_adj: 0.204

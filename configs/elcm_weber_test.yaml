@@ -1,0 +1,269 @@
+name: elcm
+
+model_type: segmented_locationchoice
+
+segmentation_col: sector_id
+
+choosers_fit_filters: cid == 57
+
+choosers_predict_filters: cid == 57
+
+alts_fit_filters:
+- job_spaces > 0
+- county_id == 57
+
+alts_predict_filters: county_id == 57
+
+interaction_predict_filters: null
+
+choice_column: null
+
+sample_size: 50
+
+estimation_sample_size: 1000
+
+prediction_sample_size: null
+
+default_config:
+    model_expression: is_industrial + is_office + jobs_1_500 + unit_price_non_residential + volume_two_way_nofwy + is_other
+
+models:
+    1:
+        fit_parameters:
+            Coefficient:
+                is_industrial: -3 #-0.9250021776653284
+                is_office: -0.81490961137295
+                jobs_1_500: 2.734412253829038
+                unit_price_non_residential: 0.0451810976614921
+                volume_two_way_nofwy: 1.0839510544699974e-05
+                is_other: 0.7592641616494256                
+            Std. Error:
+                is_industrial: -0.9250021776653284
+                is_office: -0.81490961137295
+                jobs_1_500: 2.734412253829038
+                unit_price_non_residential: 0.0451810976614921
+                volume_two_way_nofwy: 1.0839510544699974e-05
+                is_other: 0.7592641616494256
+            T-Score:
+                is_industrial: -0.9250021776653284
+                is_office: -0.81490961137295
+                jobs_1_500: 2.734412253829038
+                unit_price_non_residential: 0.0451810976614921
+                volume_two_way_nofwy: 1.0839510544699974e-05
+                is_other: 0.7592641616494256
+        fitted: true
+        log_likelihoods:
+            convergence: -3255.894989798878
+            'null': -3912.023005428176
+            ratio: 0.16772089906395726
+        model_expression: is_industrial + is_office + jobs_1_500 + unit_price_non_residential + volume_two_way_nofwy + is_other
+        name: 1
+    3:
+        fit_parameters:
+            Coefficient:
+                is_industrial: -1.7988089834329164
+                real_far: 0.0758838058999604
+                unit_price_non_residential: -0.0590711262659789
+                jobs_3_1000: 2.706110421383856
+                parcel_volume: -0.0490008758357109
+                jobs_200: 4.994011659540549                
+            Std. Error:
+                is_industrial: -1.7988089834329164
+                real_far: 0.0758838058999604
+                unit_price_non_residential: -0.0590711262659789
+                jobs_3_1000: 2.706110421383856
+                parcel_volume: -0.0490008758357109
+                jobs_200: 4.994011659540549
+            T-Score:
+                is_industrial: -1.7988089834329164
+                real_far: 0.0758838058999604
+                unit_price_non_residential: -0.0590711262659789
+                jobs_3_1000: 2.706110421383856
+                parcel_volume: -0.0490008758357109
+                jobs_200: 4.994011659540549
+        fitted: true
+        log_likelihoods:
+            convergence: -2831.7038220562417
+            'null': -3912.023005428176
+            ratio: 0.27615358648784116
+        model_expression: is_industrial + real_far + unit_price_non_residential + jobs_3_1000 + parcel_volume + jobs_200
+        name: 3
+    4:
+        fit_parameters:
+            Coefficient:
+                is_industrial: -0.8405375458394472
+                ave_sqft_per_unit_500: -0.1232166124110159
+                jobs_4_500: 5.209370933668965
+                is_office: 1.3176145950159073
+                is_other: 1.1254549890519834                
+            Std. Error:
+                is_industrial: -0.8405375458394472
+                ave_sqft_per_unit_500: -0.1232166124110159
+                jobs_4_500: 5.209370933668965
+                is_office: 1.3176145950159073
+                is_other: 1.1254549890519834
+            T-Score:
+                is_industrial: -0.8405375458394472
+                ave_sqft_per_unit_500: -0.1232166124110159
+                jobs_4_500: 5.209370933668965
+                is_office: 1.3176145950159073
+                is_other: 1.1254549890519834
+        fitted: true
+        log_likelihoods:
+            convergence: -2345.4419155646738
+            'null': -3912.023005428176
+            ratio: 0.4004529338630609
+        model_expression: is_industrial + ave_sqft_per_unit_500 + jobs_4_500 + is_office + is_other
+        name: 4
+    5:
+        fit_parameters:
+            Coefficient:
+                is_industrial: 0.8868271454190778
+                jobs_1_500: -0.4735262248842933
+                real_far: 0.0760611890202819
+                jobs_5_500: 6.607051599408776                
+            Std. Error:
+                is_industrial: 0.8868271454190778
+                jobs_1_500: -0.4735262248842933
+                real_far: 0.0760611890202819
+                jobs_5_500: 6.607051599408776
+            T-Score:
+                is_industrial: 0.8868271454190778
+                jobs_1_500: -0.4735262248842933
+                real_far: 0.0760611890202819
+                jobs_5_500: 6.607051599408776
+        fitted: true
+        log_likelihoods:
+            convergence: -2090.9119593897813
+            'null': -3912.023005428176
+            ratio: 0.46551644596964015
+        model_expression: is_industrial + jobs_1_500 + real_far + jobs_5_500
+        name: 5
+    6:
+        fit_parameters:
+            Coefficient:
+                is_industrial: -0.5528518499754288
+                ave_sqft_per_unit_500: -0.1098877964881065
+                is_other: 1.7100443525375442
+                is_office: 0.9883197719990048
+                real_far: 0.0991157140232174
+                jobs_6_500: 3.245782114129597                
+            Std. Error:
+                is_industrial: -0.5528518499754288
+                ave_sqft_per_unit_500: -0.1098877964881065
+                is_other: 1.7100443525375442
+                is_office: 0.9883197719990048
+                real_far: 0.0991157140232174
+                jobs_6_500: 3.245782114129597
+            T-Score:
+                is_industrial: -0.5528518499754288
+                ave_sqft_per_unit_500: -0.1098877964881065
+                is_other: 1.7100443525375442
+                is_office: 0.9883197719990048
+                real_far: 0.0991157140232174
+                jobs_6_500: 3.245782114129597
+        fitted: true
+        log_likelihoods:
+            convergence: -2934.958598020698
+            'null': -3912.023005428176
+            ratio: 0.24975937157111305
+        model_expression: is_industrial + ave_sqft_per_unit_500 + is_other + is_office + real_far + jobs_6_500
+        name: 6
+    7:
+        fit_parameters:
+            Coefficient:
+                ave_sqft_per_unit_500: -0.1062888342166642
+                commute_time: 0.0811056685455589
+                is_other: 1.3968742854562497
+                is_office: 0.6081186152748232
+                real_far: 0.0435983894823748
+                jobs_7_500: 5.210896851156322                
+            Std. Error:
+                ave_sqft_per_unit_500: -0.1062888342166642
+                commute_time: 0.0811056685455589
+                is_other: 1.3968742854562497
+                is_office: 0.6081186152748232
+                real_far: 0.0435983894823748
+                jobs_7_500: 5.210896851156322
+            T-Score:
+                ave_sqft_per_unit_500: -0.1062888342166642
+                commute_time: 0.0811056685455589
+                is_other: 1.3968742854562497
+                is_office: 0.6081186152748232
+                real_far: 0.0435983894823748
+                jobs_7_500: 5.210896851156322
+        fitted: true
+        log_likelihoods:
+            convergence: -3394.6466648064716
+            'null': -3912.023005428176
+            ratio: 0.13225288805914803
+        model_expression: ave_sqft_per_unit_500 + commute_time + is_other + is_office + real_far + jobs_7_500
+        name: 7
+    9:
+        fit_parameters:
+            Coefficient:
+                jobs_9_500: 5.015824693722379
+                is_other: 1.026211812913619
+                mfdu_500: -0.2448177818516486
+                unit_price_non_residential: 0.0458733231651499
+                ave_sqft_per_unit_500: -0.0567122258130429
+                commute_time: 0 # 0.0687062931386142                
+            Std. Error:
+                jobs_9_500: 5.015824693722379
+                is_other: 1.026211812913619
+                mfdu_500: -0.2448177818516486
+                unit_price_non_residential: 0.0458733231651499
+                ave_sqft_per_unit_500: -0.0567122258130429
+                commute_time: 0.0687062931386142
+            T-Score:
+                jobs_9_500: 5.015824693722379
+                is_other: 1.026211812913619
+                mfdu_500: -0.2448177818516486
+                unit_price_non_residential: 0.0458733231651499
+                ave_sqft_per_unit_500: -0.0567122258130429
+                commute_time: 0.0687062931386142
+        fitted: true
+        log_likelihoods:
+            convergence: -3001.752059593942
+            'null': -3912.023005428176
+            ratio: 0.23268547873342682
+        model_expression: jobs_9_500 + is_other + mfdu_500 + unit_price_non_residential + ave_sqft_per_unit_500 + commute_time
+        name: 9
+    10:
+        fit_parameters:
+            Coefficient:
+                jobs_10_500: 5.332347857933795
+                sfdu_1000: -0.1838799640510479
+                rail_depot: 0.375466835178332
+                jobs_4_500: -0.4762035306599312
+                jobs_9_500: -0.3471305893890767
+                university_dist: 0.1847984504855419                
+            Std. Error:
+                jobs_10_500: 5.332347857933795
+                sfdu_1000: -0.1838799640510479
+                rail_depot: 0.375466835178332
+                jobs_4_500: -0.4762035306599312
+                jobs_9_500: -0.3471305893890767
+                university_dist: 0.1847984504855419
+            T-Score:
+                jobs_10_500: 5.332347857933795
+                sfdu_1000: -0.1838799640510479
+                rail_depot: 0.375466835178332
+                jobs_4_500: -0.4762035306599312
+                jobs_9_500: -0.3471305893890767
+                university_dist: 0.1847984504855419
+        fitted: true
+        log_likelihoods:
+            convergence: -2257.291258690822
+            'null': -3912.023005428176
+            ratio: 0.4229862003473166
+        model_expression: jobs_10_500 + sfdu_1000 + rail_depot + jobs_4_500 + jobs_9_500 + university_dist
+        name: 10
+
+fitted: true
+
+probability_mode: single_chooser
+
+choice_mode: aggregate
+
+remove_alts: true

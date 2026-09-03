@@ -37,36 +37,36 @@ estimation_sample_size: 15000
 prediction_sample_size: null
 
 default_config:
-    model_expression: is_mf + np.log1p(low_income_500) + np.log1p(jobs_1_500) + np.log1p(jobs_200) + bus_rte_dist + np.log1p(sfdu_1500) + real_far + university_dist
+    model_expression: is_mf + low_income_500 + jobs_1_500 + jobs_200 + bus_rte_dist + sfdu_1500 + real_far + university_dist
 
 models:
     1:
         fit_parameters:
             Coefficient:             
                 is_mf: 2.20236900305514
-                np.log1p(low_income_500): 2.138946899198277
-                np.log1p(jobs_1_500): 0.0856114647366189
-                np.log1p(jobs_200): 0.0516599121368461
+                low_income_500: 2.138946899198277
+                jobs_1_500: 0.0856114647366189
+                jobs_200: 0.0516599121368461
                 bus_rte_dist: -4.4447618209761496e-05
-                np.log1p(sfdu_1500): -3.2836855657256807
+                sfdu_1500: -3.2836855657256807
                 real_far: 0.2825760530127256
                 university_dist: -0.028497350058284                
             Std. Error:
                 is_mf: 2.20236900305514
-                np.log1p(low_income_500): 2.138946899198277
-                np.log1p(jobs_1_500): 0.0856114647366189
-                np.log1p(jobs_200): 0.0516599121368461
+                low_income_500: 2.138946899198277
+                jobs_1_500: 0.0856114647366189
+                jobs_200: 0.0516599121368461
                 bus_rte_dist: -4.4447618209761496e-05
-                np.log1p(sfdu_1500): -3.2836855657256807
+                sfdu_1500: -3.2836855657256807
                 real_far: 0.2825760530127256
                 university_dist: -0.028497350058284
             T-Score:
                 is_mf: 2.20236900305514
-                np.log1p(low_income_500): 2.138946899198277
-                np.log1p(jobs_1_500): 0.0856114647366189
-                np.log1p(jobs_200): 0.0516599121368461
+                low_income_500: 2.138946899198277
+                jobs_1_500: 0.0856114647366189
+                jobs_200: 0.0516599121368461
                 bus_rte_dist: -4.4447618209761496e-05
-                np.log1p(sfdu_1500): -3.2836855657256807
+                sfdu_1500: -3.2836855657256807
                 real_far: 0.2825760530127256
                 university_dist: -0.028497350058284
         fitted: true
@@ -74,7 +74,7 @@ models:
             convergence: -47630.03404183601
             'null': -58649.04889736062
             ratio: 0.18788053792327575
-        model_expression: is_mf + np.log1p(low_income_500) + np.log1p(jobs_1_500) + np.log1p(jobs_200) + bus_rte_dist + np.log1p(sfdu_1500) + real_far + university_dist - 1
+        model_expression: is_mf + low_income_500 + jobs_1_500 + jobs_200 + bus_rte_dist + sfdu_1500 + real_far + university_dist - 1
         name: 1
     2:
         fit_parameters:
@@ -83,9 +83,9 @@ models:
                 building_age: -0.0067278069312979
                 university_dist: -0.0577420033684529
                 commute_time: -0.0269654215524444
-                np.log1p(low_income_500): 0.8363541428414133
-                np.log1p(jobs_200): 0.0864994869634604
-                np.log1p(mfdu_500): 0.0650532867539395
+                low_income_500: 0.8363541428414133
+                jobs_200: 0.0864994869634604
+                mfdu_500: 0.0650532867539395
                 bus_rte_dist: -9.398795462409504e-06
                 ave_sqft_per_unit_500: -0.0801368407962209
                 trail_dist: -0.2420729565500695
@@ -96,9 +96,9 @@ models:
                 building_age: -0.0067278069312979
                 university_dist: -0.0577420033684529
                 commute_time: -0.0269654215524444
-                np.log1p(low_income_500): 0.8363541428414133
-                np.log1p(jobs_200): 0.0864994869634604
-                np.log1p(mfdu_500): 0.0650532867539395
+                low_income_500: 0.8363541428414133
+                jobs_200: 0.0864994869634604
+                mfdu_500: 0.0650532867539395
                 bus_rte_dist: -9.398795462409504e-06
                 ave_sqft_per_unit_500: -0.0801368407962209
                 trail_dist: -0.2420729565500695
@@ -109,9 +109,9 @@ models:
                 building_age: -0.0067278069312979
                 university_dist: -0.0577420033684529
                 commute_time: -0.0269654215524444
-                np.log1p(low_income_500): 0.8363541428414133
-                np.log1p(jobs_200): 0.0864994869634604
-                np.log1p(mfdu_500): 0.0650532867539395
+                low_income_500: 0.8363541428414133
+                jobs_200: 0.0864994869634604
+                mfdu_500: 0.0650532867539395
                 bus_rte_dist: -9.398795462409504e-06
                 ave_sqft_per_unit_500: -0.0801368407962209
                 trail_dist: -0.2420729565500695
@@ -122,7 +122,7 @@ models:
             convergence: -50664.876689628334
             'null': -58656.87294337147
             ratio: 0.1362499542288722
-        model_expression: parcel_volume + building_age + university_dist + commute_time + np.log1p(low_income_500) + np.log1p(jobs_200) + np.log1p(mfdu_500) + bus_rte_dist + ave_sqft_per_unit_500 + trail_dist + is_sf + real_far - 1
+        model_expression: parcel_volume + building_age + university_dist + commute_time + low_income_500 + jobs_200 + mfdu_500 + bus_rte_dist + ave_sqft_per_unit_500 + trail_dist + is_sf + real_far - 1
         name: 2
     3:
         fit_parameters:
@@ -132,27 +132,27 @@ models:
                 university_dist: 0.0444858599342718
                 commute_time: -0.0673810900563707
                 res_price_per_sqft: -0.014431783683287
-                np.log1p(sfdu_1500): -2.248963335404752                                
+                sfdu_1500: -2.248963335404752                                
             Std. Error:
                 building_age: -0.0104231104861689
                 parcel_volume: 0.0069945449138019
                 university_dist: 0.0444858599342718
                 commute_time: -0.0673810900563707
                 res_price_per_sqft: -0.014431783683287
-                np.log1p(sfdu_1500): -2.248963335404752
+                sfdu_1500: -2.248963335404752
             T-Score:
                 building_age: -0.0104231104861689
                 parcel_volume: 0.0069945449138019
                 university_dist: 0.0444858599342718
                 commute_time: -0.0673810900563707
                 res_price_per_sqft: -0.014431783683287
-                np.log1p(sfdu_1500): -2.248963335404752
+                sfdu_1500: -2.248963335404752
         fitted: true
         log_likelihoods:
             convergence: -57228.43435597869
             'null': -58652.960920366044
             ratio: 0.024287376835441576
-        model_expression: building_age + parcel_volume + university_dist + commute_time + res_price_per_sqft + np.log1p(sfdu_1500) - 1
+        model_expression: building_age + parcel_volume + university_dist + commute_time + res_price_per_sqft + sfdu_1500 - 1
         name: 3
     4:
         fit_parameters:

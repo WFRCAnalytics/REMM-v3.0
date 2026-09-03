@@ -38,7 +38,7 @@ estimation_sample_size: 15000
 prediction_sample_size: null
 
 default_config:
-    model_expression: is_mf + parcel_volume + np.log1p(low_income_500) + building_age + np.log1p(sfdu_1500) + np.log1p(jobs_5_within_10_min) + stream_dist + commute_time
+    model_expression: is_mf + parcel_volume + low_income_500 + building_age + sfdu_1500 + np.log1p(jobs_5_within_10_min) + stream_dist + commute_time
 
 models:
     1:
@@ -46,27 +46,27 @@ models:
             Coefficient:
                 is_mf: 3.092519397770785
                 parcel_volume: 0.0033177778990855
-                np.log1p(low_income_500): 1.2686932075571835
+                low_income_500: 1.2686932075571835
                 building_age: -0.130477820097156
-                np.log1p(sfdu_1500): -2.1129202131572145
+                sfdu_1500: -2.1129202131572145
                 np.log1p(jobs_5_within_10_min): 0.052958557564151
                 stream_dist: 0.1871241256430721
                 commute_time: -0.0111463112364753                
             Std. Error:
                 is_mf: 3.092519397770785
                 parcel_volume: 0.0033177778990855
-                np.log1p(low_income_500): 1.2686932075571835
+                low_income_500: 1.2686932075571835
                 building_age: -0.130477820097156
-                np.log1p(sfdu_1500): -2.1129202131572145
+                sfdu_1500: -2.1129202131572145
                 np.log1p(jobs_5_within_10_min): 0.052958557564151
                 stream_dist: 0.1871241256430721
                 commute_time: -0.0111463112364753
             T-Score:
                 is_mf: 3.092519397770785
                 parcel_volume: 0.0033177778990855
-                np.log1p(low_income_500): 1.2686932075571835
+                low_income_500: 1.2686932075571835
                 building_age: -0.130477820097156
-                np.log1p(sfdu_1500): -2.1129202131572145
+                sfdu_1500: -2.1129202131572145
                 np.log1p(jobs_5_within_10_min): 0.052958557564151
                 stream_dist: 0.1871241256430721
                 commute_time: -0.0111463112364753
@@ -75,7 +75,7 @@ models:
             convergence: -18417.244813030087
             'null': -58668.609012387744
             ratio: 0.6860800839995826
-        model_expression: is_mf + parcel_volume + np.log1p(low_income_500) + building_age + np.log1p(sfdu_1500) + np.log1p(jobs_5_within_10_min) + stream_dist + commute_time - 1
+        model_expression: is_mf + parcel_volume + low_income_500 + building_age + sfdu_1500 + np.log1p(jobs_5_within_10_min) + stream_dist + commute_time - 1
         name: 1
     2:
         fit_parameters:
@@ -85,7 +85,7 @@ models:
                 university_dist: 0.052
                 is_mf: 3.524
                 parcel_volume: 0.002
-                np.log1p(jobs_ind_1500): 0.044
+                jobs_ind_1500: 0.044
                 building_age: -0.13292806
                 real_far: 0.033                
             Std. Error:
@@ -94,7 +94,7 @@ models:
                 university_dist: 0.052
                 is_mf: 3.524
                 parcel_volume: 0.002
-                np.log1p(jobs_ind_1500): 0.044
+                jobs_ind_1500: 0.044
                 building_age: -0.13292806
                 real_far: 0.033
             T-Score:
@@ -103,7 +103,7 @@ models:
                 university_dist: 0.052
                 is_mf: 3.524
                 parcel_volume: 0.002
-                np.log1p(jobs_ind_1500): 0.044
+                jobs_ind_1500: 0.044
                 building_age: -0.13292806
                 real_far: 0.033
         fitted: true
@@ -111,7 +111,7 @@ models:
             convergence: -22865.369083556565
             'null': -58676.433058398594
             ratio: 0.6103142626137572
-        model_expression: ave_income_1000 + commute_time + university_dist + is_mf + parcel_volume + np.log1p(jobs_ind_1500) + building_age + real_far - 1
+        model_expression: ave_income_1000 + commute_time + university_dist + is_mf + parcel_volume + jobs_ind_1500 + building_age + real_far - 1
         name: 2
     3:
         fit_parameters:

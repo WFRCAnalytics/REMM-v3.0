@@ -1,7 +1,7 @@
 default_config:
   model_expression: building_age + bus_rte_dist + np.log1p(industrial_sqft_1000)
-    + np.log1p(jobs_6_500) + np.log1p(jobs_5_within_10_min) + np.log1p(jobs_9_500)
-    + np.log1p(sfdu_1500) + np.log1p(res_units_within_20_min)
+    + jobs_6_500 + np.log1p(jobs_5_within_10_min) + jobs_9_500
+    + sfdu_1500 + np.log1p(res_units_within_20_min)
   ytransform: np.exp
 fit_filters:
 - unit_price_non_residential > 3
@@ -27,30 +27,30 @@ models:
         bus_rte_dist: -0.000160345800854
         np.log1p(industrial_sqft_1000): -0.018092112420431
         np.log1p(jobs_5_within_10_min): -0.042763947742064
-        np.log1p(jobs_6_500): 0.44917776235364
-        np.log1p(jobs_9_500): 0.100950136707607
+        jobs_6_500: 0.44917776235364
+        jobs_9_500: 0.100950136707607
         np.log1p(res_units_within_20_min): -0.161010565801212
-        np.log1p(sfdu_1500): -0.105676946319759
+        sfdu_1500: -0.105676946319759
       Std. Error:
         Intercept: 4.701558755310948
         building_age: -0.001949972091956
         bus_rte_dist: -0.000160345800854
         np.log1p(industrial_sqft_1000): -0.018092112420431
         np.log1p(jobs_5_within_10_min): -0.042763947742064
-        np.log1p(jobs_6_500): 0.44917776235364
-        np.log1p(jobs_9_500): 0.100950136707607
+        jobs_6_500: 0.44917776235364
+        jobs_9_500: 0.100950136707607
         np.log1p(res_units_within_20_min): -0.161010565801212
-        np.log1p(sfdu_1500): -0.105676946319759
+        sfdu_1500: -0.105676946319759
       T-Score:
         Intercept: 4.701558755310948
         building_age: -0.001949972091956
         bus_rte_dist: -0.000160345800854
         np.log1p(industrial_sqft_1000): -0.018092112420431
         np.log1p(jobs_5_within_10_min): -0.042763947742064
-        np.log1p(jobs_6_500): 0.44917776235364
-        np.log1p(jobs_9_500): 0.100950136707607
+        jobs_6_500: 0.44917776235364
+        jobs_9_500: 0.100950136707607
         np.log1p(res_units_within_20_min): -0.161010565801212
-        np.log1p(sfdu_1500): -0.105676946319759
+        sfdu_1500: -0.105676946319759
     fit_rsquared: 0.472
     fit_rsquared_adj: 0.465
     fitted: true

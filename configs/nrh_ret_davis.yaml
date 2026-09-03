@@ -25,7 +25,7 @@ predict_filters:
 min_segment_size: 10
 
 default_config:
-    model_expression: building_age + rail_stn_dist + parcel_volume + volume_two_way_nofwy + np.log1p(jobs_7_500)
+    model_expression: building_age + rail_stn_dist + parcel_volume + volume_two_way_nofwy + jobs_7_500
 
     ytransform: np.exp
 
@@ -38,21 +38,21 @@ models:
                 rail_stn_dist: -0.000010752821399
                 parcel_volume: 0.007069959226946
                 volume_two_way_nofwy: -0.000010975383352
-                np.log1p(jobs_7_500): -0.290817721792210
+                jobs_7_500: -0.290817721792210
             Std. Error:
                 Intercept: 3.577802303721933
                 building_age: -0.009666734019177
                 rail_stn_dist: -0.000010752821399
                 parcel_volume: 0.007069959226946
                 volume_two_way_nofwy: -0.000010975383352
-                np.log1p(jobs_7_500): -0.290817721792210
+                jobs_7_500: -0.290817721792210
             T-Score:
                 Intercept: 3.577802303721933
                 building_age: -0.009666734019177
                 rail_stn_dist: -0.000010752821399
                 parcel_volume: 0.007069959226946
                 volume_two_way_nofwy: -0.000010975383352
-                np.log1p(jobs_7_500): -0.290817721792210
+                jobs_7_500: -0.290817721792210
         fit_rsquared: 0.310
         fit_rsquared_adj: 0.282
         fitted: true
