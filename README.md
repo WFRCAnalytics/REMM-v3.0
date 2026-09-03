@@ -1,8 +1,8 @@
 # REMM-v3.0
 
-Real Estate Market Model: Where Will We Live and Work in the Future
+Real Estate Market Model: Where Will Utahns Live and Work in the Future?
 
-![Utah is growing!!](misc/remm_graphic.png)
+[Utah is growing!!](misc/remm_graphic.png)
 
 The Real Estate Market Model (REMM) relies on best available resources to project future residential and employment-related development activity using the UrbanSim modeling platform. In order to accurately model future years, REMM is first calibrated to best reflect the base year of the adopted RTP, currently 2023. Critical inputs to REMM’s consideration of available land and profitability of new and redevelopment activity include:  
 
@@ -20,5 +20,5 @@ These household and job distribution projections inform future trip generation i
 Resources:  
 
 [Model Documentation - Needs Updating!](https://docs.google.com/document/d/1zF3MWmOhru1-82TL6yOfIDP_rhoKDDRYtqSdHP4eJcQ/edit?tab=t.0)  
-[Installation Instructions](https://docs.google.com/document/d/1QW1MMaRt1T9WUiNs4Ig9TdYE77BgdEVSFF-uPRnV2rk/edit)  
+[Full Installation Instructions](https://docs.google.com/document/d/1QW1MMaRt1T9WUiNs4Ig9TdYE77BgdEVSFF-uPRnV2rk/edit)  
 
