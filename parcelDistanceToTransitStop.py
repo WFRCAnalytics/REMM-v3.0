@@ -1,148 +1,120 @@
-import arcpy
-from arcpy import env, management, analysis
-import os
+"""REMM transit distances without ArcPy or the ArcGIS Python API.
+
+Install: uv add geopandas pyogrio
+Keep the project's existing orca_wfrc dependency.
+Distances use full parcel geometries (not centroids), in EPSG:26912,
+then convert meters to feet. Compare against a known ArcPy year before use:
+the original assumes its input parcel CRS uses meters; a different input
+projection can give slightly different planar distances.
+No stops in a category produces missing distances, never a false zero.
+"""
+
 from datetime import date
-from arcgis import GIS
-from arcgis.features import GeoAccessor
-from arcgis.features import GeoSeriesAccessor
-import pandas as pd
-import glob
+from pathlib import Path
 
-import h5py
-from simpledbf import Dbf5
+import geopandas as gpd
 import numpy as np
-import random
-
+import pandas as pd
+import pyogrio
 
 import orca_wfrc.orca as sim
 
-@sim.step('parcelDistanceToTransitStop')
+
+DEFAULT_PARCEL_GDB = (
+    r"\\server1\Volumef\SHARED\Andy\_FromJosh\Parcel Distance 2 Transit Stops"
+    r"\remm_base_year.gdb"
+)
+DISTANCE_CRS = "EPSG:26912"  # NAD83 / UTM zone 12N; meters
+METERS_TO_FEET = 3.28084
+
+
+def nearest_distance_feet(parcels, stops):
+    """Return one distance per parcel row, including when nearest stops tie."""
+    distances = pd.Series(np.nan, index=parcels.index, dtype="float64")
+    if parcels.empty or stops.empty:
+        return distances
+    nearest = gpd.sjoin_nearest(
+        parcels[[parcels.geometry.name]],
+        stops[[stops.geometry.name]],
+        how="left",
+        distance_col="distance_m",
+    )
+    # Equidistant stops can yield multiple matches for a single parcel.
+    minimum = nearest.groupby(level=0)["distance_m"].min()
+    return minimum.reindex(parcels.index) * METERS_TO_FEET
+
+
+def write_dbf(frame, path):
+    """Write an attribute-only DBF using GDAL through Pyogrio."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # A plain DataFrame creates a table without shapefile geometry.
+    pyogrio.write_dataframe(
+        pd.DataFrame(frame), path, driver="ESRI Shapefile", encoding="UTF-8"
+    )
+
+
+@sim.step("parcelDistanceToTransitStop")
 def parcelDistanceToTransitStop(year, settings, store):
-    if year in settings['tdm']['run_years']:
-        arcpy.env.overwriteOutput = True
-        arcpy.env.parallelProcessingFactor = "90%"
+    if year not in settings["tdm"]["run_years"]:
+        return
 
-        pd.options.display.max_columns = None
+    tdm = settings["tdm"]
+    output_dir = Path("Outputs")
+    year_dir = Path(tdm["main_dir"]) / str(year)
+    input_dir = year_dir / "0_InputProcessing"
+    transit_dir = year_dir / "6_REMM"
+    output_dir.mkdir(parents=True, exist_ok=True)
+    transit_dir.mkdir(parents=True, exist_ok=True)
 
-        # fill NA values in Spatially enabled dataframes (ignores SHAPE column)
-        def fill_na_sedf(df_with_shape_column, fill_value=0):
-            if 'SHAPE' in list(df_with_shape_column.columns):
-                df = df_with_shape_column.copy()
-                shape_column = df['SHAPE'].copy()
-                del df['SHAPE']
-                return df.fillna(fill_value).merge(shape_column, left_index=True, right_index=True, how='inner')
-            else:
-                raise Exception("Dataframe does not include 'SHAPE' column")
+    # Optional settings overrides allow other users to choose their data path.
+    parcels = gpd.read_file(
+        tdm.get("parcel_gdb", DEFAULT_PARCEL_GDB),
+        layer=tdm.get("parcel_layer", "parcels"),
+        columns=["parcel_id"],
+        engine="pyogrio",
+    ).reset_index(drop=True)
+    if "parcel_id" not in parcels.columns:
+        raise ValueError("Parcel layer must contain parcel_id.")
+    if parcels.crs is None:
+        raise ValueError("Parcel layer has no CRS; define its correct CRS first.")
+    bad = parcels.geometry.isna() | parcels.geometry.is_empty | ~parcels.geometry.is_valid
+    if bad.any():
+        raise ValueError(f"Parcel layer contains {bad.sum()} missing, empty, or invalid geometries.")
+    parcels = parcels.to_crs(DISTANCE_CRS)
 
-        if not os.path.exists('Outputs'):
-            os.makedirs('Outputs')
+    def read_stops(filename, columns):
+        frame = pyogrio.read_dataframe(input_dir / filename, read_geometry=False)
+        missing = set(columns) - set(frame.columns)
+        if missing:
+            raise ValueError(f"{filename} is missing fields: {sorted(missing)}")
+        return frame
 
-        outputs = ['.\\Outputs', "scratch.gdb", 'results.gdb']
-        gdb = os.path.join(outputs[0], outputs[1])
-        gdb2 = os.path.join(outputs[0], outputs[2])
+    all_stops = read_stops("c_StopsAllModes.dbf", ["N", "X", "Y"])
+    mode7 = read_stops("c_StopsMode7.dbf", ["N"])
+    mode8 = read_stops("c_StopsMode8.dbf", ["N"])
 
-        if not arcpy.Exists(gdb):
-            arcpy.CreateFileGDB_management(outputs[0], outputs[1])
+    # Membership avoids duplicate stop rows from repeated mode identifiers.
+    all_stops["mode7"] = all_stops["N"].isin(mode7["N"].dropna()).astype(int)
+    all_stops["mode8"] = all_stops["N"].isin(mode8["N"].dropna()).astype(int)
+    all_stops["rail"] = ((all_stops["mode7"] == 1) | (all_stops["mode8"] == 1)).astype(int)
+    for column in ["X", "Y"]:
+        all_stops[column] = pd.to_numeric(all_stops[column], errors="raise")
+    if not np.isfinite(all_stops[["X", "Y"]].to_numpy(dtype=float)).all():
+        raise ValueError("Transit stops contain missing or nonfinite X/Y coordinates.")
 
-        if not arcpy.Exists(gdb2):
-            arcpy.CreateFileGDB_management(outputs[0], outputs[2])
+    all_stops.to_csv(transit_dir / f"TransitStopsTest{year}.csv", index=False)
+    stops = gpd.GeoDataFrame(
+        all_stops,
+        geometry=gpd.points_from_xy(all_stops["X"], all_stops["Y"]),
+        crs=DISTANCE_CRS,  # Same coordinate assumption as the original code.
+    )
 
-        parcels = r"\\server1\Volumef\SHARED\Andy\_FromJosh\Parcel Distance 2 Transit Stops\remm_base_year.gdb\parcels"
-        parcel_df = pd.DataFrame.spatial.from_featureclass(parcels)[['OBJECTID', 'parcel_id']].copy()
+    result = pd.DataFrame({"parcel_id": parcels["parcel_id"]})
+    result["dist2rails"] = nearest_distance_feet(parcels, stops.loc[stops["rail"] == 1])
+    # Original CLEAR_SELECTION uses ALL stops here, including rail.
+    result["dist2busst"] = nearest_distance_feet(parcels, stops)
 
-        "process the transit stops with x and y needed"
-
-        stopsdir = settings['tdm']['main_dir'] + str(year) + '/0_InputProcessing/'
-        allstopsfile =os.path.join(stopsdir, f'c_StopsAllModes.dbf')
-        mo7stopsfile = os.path.join(stopsdir, f'c_StopsMode7.dbf')
-        mo8stopsfile = os.path.join(stopsdir, f'c_StopsMode8.dbf')
-
-        allstops = Dbf5(allstopsfile)
-        allstops = allstops.to_dataframe()
-        mo7stops = Dbf5(mo7stopsfile)
-        mo7stops = mo7stops.to_dataframe()
-        mo8stops = Dbf5(mo8stopsfile)
-        mo8stops = mo8stops.to_dataframe()
-        mo7stops = mo7stops[['N']]
-        mo8stops = mo8stops[['N']]
-        mo7stops['mode7'] = 1
-        mo8stops['mode8'] = 1
-        result = allstops.merge(mo7stops, how='left', left_on='N', right_on='N').merge(mo8stops, how='left', left_on='N',
-                                                                                       right_on='N')
-        result = result.fillna(0)
-        result['rail'] = 1
-        result.rail[(result.mode7 == 0) & (result.mode8 == 0)] = 0
-        tdmTransitStopsfolder =settings['tdm']['main_dir'] + str(year) + '/6_REMM'
-        # tdmTransitStopsfolder = os.path.join(settings['tdm']['main_dir'], str(year) + '/6_REMM')
-        tdmTransitStopsfolderFile= os.path.join(tdmTransitStopsfolder,'/TransitStopsTest'+str(year)+'.csv')
-        result.to_csv(tdmTransitStopsfolderFile)
-
-        csvs = glob.glob(os.path.join(tdmTransitStopsfolderFile))
-
-
-        d = date.today().strftime("%Y%m%d")
-
-        for csv in csvs:
-
-
-            # convert to xy
-            # year = os.path.basename(csv).split('.')[0].split('_')[1]
-            # print('working on {}'.format(year))
-            result = os.path.join(outputs[0], os.path.basename(csv).split('.')[0] + '.shp')
-            # print('--converting xy to points')
-            transit_pts = arcpy.management.XYTableToPoint(in_table=os.path.realpath(csv),
-                                                          out_feature_class=os.path.realpath(result),
-                                                          x_field="X", y_field="Y",
-                                                          coordinate_system=arcpy.SpatialReference('NAD 1983 UTM Zone 12N'))
-            transit_pts_lyr = arcpy.MakeFeatureLayer_management(transit_pts, 'transit_pts_lyr')
-
-            # ========
-            # rail
-            # ========
-            query = """ rail = 1 """
-            arcpy.SelectLayerByAttribute_management(transit_pts_lyr, 'NEW_SELECTION', query)
-
-            # generate near table
-            result2 = os.path.join(outputs[0], os.path.basename(csv).split('.')[0] + '_rail.csv')
-            # print('--rail near table')
-            rail = arcpy.analysis.GenerateNearTable(parcels, transit_pts_lyr, result2, closest='CLOSEST', method='PLANAR')
-            rail_df = pd.read_csv(result2)
-            rail_df = rail_df[['IN_FID', 'NEAR_DIST']].copy()
-            rail_df.columns = ['IN_FID', 'dist2rails']
-            rail_df['dist2rails'] = rail_df['dist2rails'] * 3.28084  # convert from meters to ft
-
-            # ========
-            # bus
-            # ========
-            arcpy.SelectLayerByAttribute_management(transit_pts_lyr, 'CLEAR_SELECTION')
-
-            # generate near table
-            result3 = os.path.join(outputs[0], os.path.basename(csv).split('.')[0] + '_bus.csv')
-            # print('--bus near table')
-            bus = arcpy.analysis.GenerateNearTable(parcels, transit_pts_lyr, result3, closest='CLOSEST', method='PLANAR')
-            bus_df = pd.read_csv(result3)
-            bus_df = bus_df[['IN_FID', 'NEAR_DIST']].copy()
-            bus_df.columns = ['IN_FID', 'dist2busst']
-            bus_df['dist2busst'] = bus_df['dist2busst'] * 3.28084  # convert from meters to ft
-
-            # ===============
-            # create table
-            # ===============
-            # print('--exporting final table')
-            df = parcel_df.merge(rail_df, left_on='OBJECTID', right_on='IN_FID', how='left')
-            df = df.merge(bus_df, left_on='OBJECTID', right_on='IN_FID', how='left')
-            df = df[['parcel_id', 'dist2rails', 'dist2busst']].copy()
-            out_csv = os.path.join(outputs[0], f"parceldistance2transitstops_{year}_{d}.csv")
-            df.to_csv(out_csv, index=False)
-            arcpy.TableToTable_conversion(out_csv, outputs[0], f"parceldistance2transitstops_{year}_{d}.dbf")
-            arcpy.TableToTable_conversion(out_csv, tdmTransitStopsfolder, f"parceldistance2transitstops.dbf")
-            os.remove(out_csv)
-
-        # cleanup
-        xmls = glob.glob(os.path.join('.\\Outputs','*.xml'))
-        cpgs = glob.glob(os.path.join('.\\Outputs','*.cpg'))
-        junk = xmls + cpgs
-
-        if len(junk) > 0:
-            for j in junk:
-                os.remove(j)
+    stamp = date.today().strftime("%Y%m%d")
+    write_dbf(result, output_dir / f"parceldistance2transitstops_{year}_{stamp}.dbf")
+    write_dbf(result, transit_dir / "parceldistance2transitstops.dbf")
